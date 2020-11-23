@@ -1,5 +1,3 @@
-const settingsTitle = '设置';
-
-const settingsButtonLabel = '设置';
-
-const settingsButtonCloseLabel = '关闭设置';
+const settingsButtonText = '设置';
+const drawerTitle = 'APSH';
+const drawerSubtitle = '高级排程系统 - H组';
