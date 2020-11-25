@@ -1,5 +1,6 @@
 import 'package:crossplatform/common/labels.dart';
 import 'package:crossplatform/layout/adaptive.dart';
+import 'package:crossplatform/widgets/drawer.dart';
 import 'package:flutter/material.dart';
 
 const appBarDesktopHeight = 128.0;
@@ -44,7 +45,7 @@ class HomePage extends StatelessWidget {
     if (isDesktop) {
       return Row(
         children: [
-          ListDrawer(),
+          SideDrawer(),
           const VerticalDivider(width: 1),
           Expanded(
             child: Scaffold(
@@ -60,7 +61,7 @@ class HomePage extends StatelessWidget {
       return Scaffold(
         appBar: const AdaptiveAppBar(),
         body: body,
-        drawer: ListDrawer(),
+        // drawer: SideDrawer(),
       );
     }
   }
@@ -101,63 +102,13 @@ class AdaptiveAppBar extends StatelessWidget implements PreferredSizeWidget {
             )
           : null,
       actions: [
-        IconButton(
-          icon: const Icon(Icons.settings),
-          tooltip: settingsButtonText,
-          onPressed: () {},
-        ),
+        if (!isDesktop)
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: settingsButtonText,
+            onPressed: () {},
+          ),
       ],
-    );
-  }
-}
-
-class ListDrawer extends StatefulWidget {
-  @override
-  _ListDrawerState createState() => _ListDrawerState();
-}
-
-class _ListDrawerState extends State<ListDrawer> {
-  static final numItems = 9;
-
-  int selectedItem = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    return Drawer(
-      child: SafeArea(
-        child: ListView(
-          children: [
-            ListTile(
-              leading: Image.asset('assets/icons/flutter.png'),
-              title: Text(
-                drawerTitle,
-                style: textTheme.headline6,
-              ),
-              subtitle: Text(
-                drawerSubtitle,
-                style: textTheme.bodyText2,
-              ),
-            ),
-            const Divider(),
-            ...Iterable<int>.generate(numItems).toList().map((i) {
-              return ListTile(
-                enabled: true,
-                selected: i == selectedItem,
-                leading: const Icon(Icons.favorite),
-                title: Text(
-                  'starterAppDrawerItem(i + 1)',
-                ),
-                onTap: () {
-                  setState(() {
-                    selectedItem = i;
-                  });
-                },
-              );
-            }),
-          ],
-        ),
-      ),
     );
   }
 }
