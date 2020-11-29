@@ -1,61 +1,117 @@
 import 'package:crossplatform/common/labels.dart';
 import 'package:crossplatform/layout/adaptive.dart';
 import 'package:crossplatform/widgets/drawer.dart';
+import 'package:crossplatform/widgets/order_detail.dart';
+import 'package:crossplatform/widgets/resource_load.dart';
+import 'package:crossplatform/widgets/resource_usage.dart';
+import 'package:crossplatform/widgets/schedule_detail.dart';
+import 'package:crossplatform/widgets/settings.dart';
 import 'package:flutter/material.dart';
 
 const appBarDesktopHeight = 128.0;
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage();
+
+  static HomePageState of(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<_InheritedHomePage>()
+        .data;
+  }
+
+  @override
+  HomePageState createState() => HomePageState();
+}
+
+class HomePageState extends State<HomePage> {
+  SelectedItem selected = SelectedItem.placeholder;
+
+  void handleClickEvent(SelectedItem item) {
+    setState(() {
+      selected = item;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
     final isDesktop = isDisplayDesktop(context);
-    final body = SafeArea(
-      child: Padding(
-        padding: isDesktop
-            ? const EdgeInsets.symmetric(horizontal: 72, vertical: 48)
-            : const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    dynamic body = Text('data');
+    switch (selected) {
+      case SelectedItem.placeholder:
+        body = Text('placeholder');
+        break;
+      case SelectedItem.timeSetting:
+        body = SettingPage();
+        break;
+      case SelectedItem.resourceUsage:
+        body = ResourceUsage();
+        break;
+      case SelectedItem.resourceLoad:
+        body = ResourceLoad();
+        break;
+      case SelectedItem.orderDetail:
+        body = OrderDetail();
+        break;
+      case SelectedItem.scheduleDetail:
+        body = ScheduleDetail();
+        break;
+      case SelectedItem.resourceLoadChart:
+        body = ResourceLoadChart();
+        break;
+      case SelectedItem.resourceLoadHumanTable:
+        body = ResourceLoadHumanTable();
+        break;
+      case SelectedItem.resourceLoadEquipmentTable:
+        body = ResourceLoadEquipmentTable();
+        break;
+      case SelectedItem.orderDetailChart:
+        body = OrderDetailChart();
+        break;
+      case SelectedItem.orderDetailTable:
+        body = OrderDetailTable();
+        break;
+      case SelectedItem.scheduleDetailOrderPlanTable:
+        body = ScheduleDetailOrderPlanTable();
+        break;
+      case SelectedItem.scheduleDetailOrderProductionTable:
+        body = ScheduleDetailOrderProductionTable();
+        break;
+      case SelectedItem.scheduleDetailProductionTable:
+        body = ScheduleDetailProductionTable();
+        break;
+      case SelectedItem.scheduleDetailProductionResourceTable:
+        body = ScheduleDetailProductionResourceTable();
+        break;
+    }
+
+    if (isDesktop) {
+      return _InheritedHomePage(
+        child: Row(
           children: [
-            Text(
-              'starterAppGenericHeadline',
-              style: textTheme.headline3.copyWith(
-                color: colorScheme.onSecondary,
+            SideDrawer(),
+            const VerticalDivider(width: 1),
+            Expanded(
+              child: Scaffold(
+                appBar: const AdaptiveAppBar(
+                  isDesktop: true,
+                ),
+                body: SafeArea(
+                  child: Padding(
+                    padding: isDesktop
+                        ? const EdgeInsets.symmetric(
+                            horizontal: 72, vertical: 48)
+                        : const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 24),
+                    child: body,
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'starterAppGenericSubtitle',
-              style: textTheme.subtitle1,
-            ),
-            const SizedBox(height: 48),
-            Text(
-              'starterAppGenericBody',
-              style: textTheme.bodyText1,
             ),
           ],
         ),
-      ),
-    );
-
-    if (isDesktop) {
-      return Row(
-        children: [
-          SideDrawer(),
-          const VerticalDivider(width: 1),
-          Expanded(
-            child: Scaffold(
-              appBar: const AdaptiveAppBar(
-                isDesktop: true,
-              ),
-              body: body,
-            ),
-          ),
-        ],
+        data: this,
       );
     } else {
       return Scaffold(
@@ -64,6 +120,21 @@ class HomePage extends StatelessWidget {
         // drawer: SideDrawer(),
       );
     }
+  }
+}
+
+class _InheritedHomePage extends InheritedWidget {
+  _InheritedHomePage({
+    Key key,
+    @required Widget child,
+    @required this.data,
+  }) : super(key: key, child: child);
+
+  final HomePageState data;
+
+  @override
+  bool updateShouldNotify(covariant InheritedWidget oldWidget) {
+    return true;
   }
 }
 
@@ -85,7 +156,7 @@ class AdaptiveAppBar extends StatelessWidget implements PreferredSizeWidget {
     final themeData = Theme.of(context);
     return AppBar(
       automaticallyImplyLeading: !isDesktop,
-      title: isDesktop ? null : Text('starterAppGenericTitle'),
+      title: Text('APSH - 时间设置'),
       bottom: isDesktop
           ? PreferredSize(
               preferredSize: const Size.fromHeight(26),
@@ -93,7 +164,7 @@ class AdaptiveAppBar extends StatelessWidget implements PreferredSizeWidget {
                 alignment: AlignmentDirectional.centerStart,
                 margin: const EdgeInsetsDirectional.fromSTEB(72, 0, 0, 22),
                 child: Text(
-                  'starterAppGenericTitle',
+                  '起始时间：设置排程系统起始时间，排程算法以该时间点为依据\n流动系数：排程系统模拟时间相对自然时间的流动速率',
                   style: themeData.textTheme.headline6.copyWith(
                     color: themeData.colorScheme.onPrimary,
                   ),
