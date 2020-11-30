@@ -1,17 +1,5 @@
 import 'package:flutter/material.dart';
 
-class ScheduleDetail extends StatefulWidget {
-  @override
-  _ScheduleDetailState createState() => _ScheduleDetailState();
-}
-
-class _ScheduleDetailState extends State<ScheduleDetail> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(child: Text('Schedule Detail'));
-  }
-}
-
 class ScheduleDetailOrderPlanTable extends StatefulWidget {
   @override
   _ScheduleDetailOrderPlanTableState createState() =>

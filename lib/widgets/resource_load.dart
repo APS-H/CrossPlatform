@@ -1,16 +1,5 @@
+import 'package:crossplatform/widgets/gantt_chart/load_demo_page.dart';
 import 'package:flutter/material.dart';
-
-class ResourceLoad extends StatefulWidget {
-  @override
-  _ResourceLoadState createState() => _ResourceLoadState();
-}
-
-class _ResourceLoadState extends State<ResourceLoad> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(child: Text('Resource Load'));
-  }
-}
 
 class ResourceLoadChart extends StatefulWidget {
   @override
@@ -20,7 +9,7 @@ class ResourceLoadChart extends StatefulWidget {
 class _ResourceLoadChartState extends State<ResourceLoadChart> {
   @override
   Widget build(BuildContext context) {
-    return Container(child: Text('Resource Load Chart'));
+    return LoadDemoPage();
   }
 }
 

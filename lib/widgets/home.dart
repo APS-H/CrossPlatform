@@ -40,22 +40,13 @@ class HomePageState extends State<HomePage> {
     dynamic body = Text('data');
     switch (selected) {
       case SelectedItem.placeholder:
-        body = Text('placeholder');
+        body = Text('');
         break;
       case SelectedItem.timeSetting:
         body = SettingPage();
         break;
       case SelectedItem.resourceUsage:
         body = ResourceUsage();
-        break;
-      case SelectedItem.resourceLoad:
-        body = ResourceLoad();
-        break;
-      case SelectedItem.orderDetail:
-        body = OrderDetail();
-        break;
-      case SelectedItem.scheduleDetail:
-        body = ScheduleDetail();
         break;
       case SelectedItem.resourceLoadChart:
         body = ResourceLoadChart();
@@ -83,6 +74,11 @@ class HomePageState extends State<HomePage> {
         break;
       case SelectedItem.scheduleDetailProductionResourceTable:
         body = ScheduleDetailProductionResourceTable();
+        break;
+      case SelectedItem.resourceLoad:
+      case SelectedItem.orderDetail:
+      case SelectedItem.scheduleDetail:
+        body = null;
         break;
     }
 

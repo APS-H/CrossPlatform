@@ -125,7 +125,7 @@ class _SideDrawerState extends State<SideDrawer> {
               selected:
                   selectedMap[SelectedItem.resourceLoad].contains(selected),
               onTap: () {
-                state.handleClickEvent(SelectedItem.resourceLoad);
+                // state.handleClickEvent(SelectedItem.resourceLoad);
                 setState(() {
                   if (selectedMap[SelectedItem.resourceLoad].contains(selected)) {
                     toggled = !toggled;
@@ -185,7 +185,7 @@ class _SideDrawerState extends State<SideDrawer> {
               selected:
                   selectedMap[SelectedItem.orderDetail].contains(selected),
               onTap: () {
-                state.handleClickEvent(SelectedItem.orderDetail);
+                // state.handleClickEvent(SelectedItem.orderDetail);
                 setState(() {
                   if (selectedMap[SelectedItem.orderDetail].contains(selected)) {
                     toggled = !toggled;
@@ -232,7 +232,7 @@ class _SideDrawerState extends State<SideDrawer> {
               selected:
                   selectedMap[SelectedItem.scheduleDetail].contains(selected),
               onTap: () {
-                state.handleClickEvent(SelectedItem.scheduleDetail);
+                // state.handleClickEvent(SelectedItem.scheduleDetail);
                 setState(() {
                   if (selectedMap[SelectedItem.scheduleDetail].contains(selected)) {
                     toggled = !toggled;

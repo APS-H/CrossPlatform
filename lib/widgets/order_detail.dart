@@ -1,16 +1,5 @@
+import 'package:crossplatform/widgets/gantt_chart/progress_demo_page.dart';
 import 'package:flutter/material.dart';
-
-class OrderDetail extends StatefulWidget {
-  @override
-  _OrderDetailState createState() => _OrderDetailState();
-}
-
-class _OrderDetailState extends State<OrderDetail> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(child: Text('Order Detail'));
-  }
-}
 
 class OrderDetailChart extends StatefulWidget {
   @override
@@ -20,7 +9,7 @@ class OrderDetailChart extends StatefulWidget {
 class _OrderDetailChartState extends State<OrderDetailChart> {
   @override
   Widget build(BuildContext context) {
-    return Container(child: Text('Order Detail Chart'));
+    return ProgressDemoPage();
   }
 }
 
