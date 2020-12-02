@@ -96,8 +96,7 @@ class HomePageState extends State<HomePage> {
                 body: SafeArea(
                   child: Padding(
                     padding: isDesktop
-                        ? const EdgeInsets.symmetric(
-                            horizontal: 72, vertical: 48)
+                        ? const EdgeInsets.all(0)
                         : const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 24),
                     child: body,
