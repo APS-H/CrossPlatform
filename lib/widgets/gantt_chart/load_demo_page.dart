@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
-var bar_colors = [
+var barColors = [
   charts.ColorUtil.fromDartColor(Colors.lightBlue),
   charts.ColorUtil.fromDartColor(Colors.blueGrey),
   charts.ColorUtil.fromDartColor(Colors.lime),
@@ -16,15 +16,15 @@ class LoadDemoPage extends StatefulWidget {
 }
 
 class LoadDemoPageState extends State<LoadDemoPage> {
-  final _data_rows = <RowData>[];
-  int _device_load = 0;
-  int _human_load = 0;
+  final _dataRows = <RowData>[];
+  int _deviceLoad = 0;
+  int _humanLoad = 0;
 
   @override
   void initState() {
     super.initState();
     /** 以下是硬编码假数据 */
-    _data_rows.add(new RowData('2017-10-01', [
+    _dataRows.add(new RowData('2017-10-01', [
       new BarLoad('Line 1', 23),
       new BarLoad('Line 2', 78),
       new BarLoad('张三', 23),
@@ -32,7 +32,7 @@ class LoadDemoPageState extends State<LoadDemoPage> {
       new BarLoad('张扬', 23),
       new BarLoad('李彤', 76),
     ]));
-    _data_rows.add(new RowData('2017-10-02', [
+    _dataRows.add(new RowData('2017-10-02', [
       new BarLoad('Line 1', 50),
       new BarLoad('Line 2', 113),
       new BarLoad('张三', 50),
@@ -40,7 +40,7 @@ class LoadDemoPageState extends State<LoadDemoPage> {
       new BarLoad('张扬', 50),
       new BarLoad('李彤', 99),
     ]));
-    _data_rows.add(new RowData('2017-10-03', [
+    _dataRows.add(new RowData('2017-10-03', [
       new BarLoad('Line 1', 68),
       new BarLoad('Line 2', 23),
       new BarLoad('张三', 58),
@@ -48,7 +48,7 @@ class LoadDemoPageState extends State<LoadDemoPage> {
       new BarLoad('张扬', 58),
       new BarLoad('李彤', 50),
     ]));
-    _data_rows.add(new RowData('2017-10-04', [
+    _dataRows.add(new RowData('2017-10-04', [
       new BarLoad('Line 1', 99),
       new BarLoad('Line 2', 58),
       new BarLoad('张三', 50),
@@ -56,7 +56,7 @@ class LoadDemoPageState extends State<LoadDemoPage> {
       new BarLoad('张扬', 50),
       new BarLoad('李彤', 99),
     ]));
-    _data_rows.add(new RowData('2017-10-05', [
+    _dataRows.add(new RowData('2017-10-05', [
       new BarLoad('Line 1', 50),
       new BarLoad('Line 2', 113),
       new BarLoad('张三', 50),
@@ -65,8 +65,8 @@ class LoadDemoPageState extends State<LoadDemoPage> {
       new BarLoad('李彤', 99),
     ]));
 
-    _device_load = 75;
-    _human_load = 66;
+    _deviceLoad = 75;
+    _humanLoad = 66;
     /** 硬编码假数据结束 */
   }
 
@@ -85,45 +85,21 @@ class LoadDemoPageState extends State<LoadDemoPage> {
   Widget _buildCharts() {
     return new ListView.builder(
       padding: const EdgeInsets.all(16.0),
-      itemCount: _data_rows.length,
+      itemCount: _dataRows.length,
       itemBuilder: (context, i) {
-        return _buildRow(_data_rows[i]);
+        return _buildRow(_dataRows[i]);
       },
     );
   }
 }
-
-// Widget getCircular(int load) {
-//   var dataGauge = [
-//     new GaugeSegment(1, load),
-//     new GaugeSegment(0, 100 - load),
-//   ];
-//   var seriesGauge = [
-//     charts.Series(
-//       data: dataGauge,
-//       domainFn: (GaugeSegment segment, _) => segment.load,
-//       measureFn: (GaugeSegment segment, _) => segment.load_percent,
-//       colorFn: (GaugeSegment segment, _) => segment.load == 0
-//           ? charts.ColorUtil.fromDartColor(Colors.white)
-//           : bar_colors[segment.load_percent ~/ 20],
-//       id: 'Segments',
-//     )
-//   ];
-//   return charts.PieChart(
-//     seriesGauge,
-//     animate: true,
-//     defaultRenderer: new charts.ArcRendererConfig(
-//         arcWidth: 30, startAngle: 4 / 5 * 3.14, arcLength: 7 / 5 * 3.14),
-//   );
-// }
 
 Widget getBar(List<BarLoad> dataBar, String date) {
   var seriesBar = [
     charts.Series(
       data: dataBar,
       domainFn: (BarLoad load, _) => load.resource,
-      measureFn: (BarLoad load, _) => load.load_percent,
-      colorFn: (BarLoad load, _) => bar_colors[load.load_percent ~/ 20],
+      measureFn: (BarLoad load, _) => load.loadPercent,
+      colorFn: (BarLoad load, _) => barColors[load.loadPercent ~/ 20],
       id: 'Load',
     )
   ];
@@ -148,9 +124,9 @@ class RowData {
 
 class BarLoad {
   String resource;
-  int load_percent;
+  double loadPercent;
 
-  BarLoad(this.resource, this.load_percent);
+  BarLoad(this.resource, this.loadPercent);
 }
 
 // class GaugeSegment {
