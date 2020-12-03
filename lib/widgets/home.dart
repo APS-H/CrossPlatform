@@ -8,7 +8,7 @@ import 'package:crossplatform/widgets/schedule_detail.dart';
 import 'package:crossplatform/widgets/settings.dart';
 import 'package:flutter/material.dart';
 
-const appBarDesktopHeight = 128.0;
+const appBarDesktopHeight = 56.0;
 
 class HomePage extends StatefulWidget {
   const HomePage();
@@ -152,21 +152,6 @@ class AdaptiveAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       automaticallyImplyLeading: !isDesktop,
       title: Text('APSH - 时间设置'),
-      bottom: isDesktop
-          ? PreferredSize(
-              preferredSize: const Size.fromHeight(26),
-              child: Container(
-                alignment: AlignmentDirectional.centerStart,
-                margin: const EdgeInsetsDirectional.fromSTEB(72, 0, 0, 22),
-                child: Text(
-                  '起始时间：设置排程系统起始时间，排程算法以该时间点为依据\n流动系数：排程系统模拟时间相对自然时间的流动速率',
-                  style: themeData.textTheme.headline6.copyWith(
-                    color: themeData.colorScheme.onPrimary,
-                  ),
-                ),
-              ),
-            )
-          : null,
       actions: [
         if (!isDesktop)
           IconButton(

@@ -1,6 +1,9 @@
+import 'package:crossplatform/common/helpers.dart';
+import 'package:crossplatform/common/colors.dart';
 import 'package:crossplatform/models/models.dart';
 import 'package:crossplatform/models/resource.dart';
 import 'package:flutter/material.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class ResourceLoadChart extends StatefulWidget {
   const ResourceLoadChart({this.defaultStartDate, this.defaultEndDate});
@@ -33,10 +36,8 @@ class _ResourceLoadChartState extends State<ResourceLoadChart> {
     List<DataColumn> columns = [];
     while (currentDate.isBefore(_endDate)) {
       columns.add(DataColumn(
-          label: Text(
-              '${currentDate.year}-${currentDate.month}-${currentDate.day}'),
-          tooltip:
-              'Resource load rate of ${currentDate.year}-${currentDate.month}-${currentDate.day}',
+          label: Text(dateString(currentDate)),
+          tooltip: '${dateString(currentDate)} 人力/设备资源负载率',
           numeric: true,
           onSort: (int columnIndex, bool ascending) => _sort<num>(
               (ResourceLoad d) => d.loadList[columnIndex - 1],
@@ -59,40 +60,81 @@ class _ResourceLoadChartState extends State<ResourceLoadChart> {
     });
   }
 
+  List<Widget> _colorLegend() {
+    List<Padding> legend = [];
+    for (int i = 0; i < progressColors.length; i++) {
+      legend.add(Padding(
+        padding: EdgeInsets.all(10),
+        child: LinearPercentIndicator(
+          width: 100,
+          lineHeight: 20.0,
+          animation: false,
+          percent: 1.0,
+          center: i == progressColors.length - 1
+              ? Text('>100%')
+              : Text('${i * 20}%~${(i + 1) * 20}%'),
+          progressColor: progressColors[i],
+          linearStrokeCap: LinearStrokeCap.roundAll,
+        ),
+      ));
+    }
+    return legend;
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(20.0),
       children: <Widget>[
         PaginatedDataTable(
+          showCheckboxColumn: false,
+          availableRowsPerPage: [10, 15, 20, 30, 50],
           actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.add),
-              tooltip: '新增资源',
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.edit),
-              tooltip: '修改资源',
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.delete),
-              tooltip: '删除资源',
-              onPressed: () {},
-            ),
+            // IconButton(
+            //   icon: Icon(Icons.add),
+            //   tooltip: '新增资源',
+            //   onPressed: () {},
+            // ),
+            // IconButton(
+            //   icon: Icon(Icons.edit),
+            //   tooltip: '修改资源',
+            //   onPressed: () {},
+            // ),
+            // IconButton(
+            //   icon: Icon(Icons.delete),
+            //   tooltip: '删除资源',
+            //   onPressed: () {},
+            // ),
             IconButton(
               icon: Icon(Icons.arrow_back_ios),
-              tooltip: '往后一天',
-              onPressed: () {},
+              tooltip: '往前一天',
+              onPressed: () {
+                setState(() {
+                  _startDate = _startDate.subtract(new Duration(days: 1));
+                  _endDate = _endDate.subtract(new Duration(days: 1));
+                });
+              },
             ),
+            Text(
+                '${dateString(_startDate)} ~ ${dateString(_endDate.subtract(new Duration(days: 1)))}'),
             IconButton(
               icon: Icon(Icons.arrow_forward_ios),
-              tooltip: '往前一天',
-              onPressed: () {},
+              tooltip: '往后一天',
+              onPressed: () {
+                setState(() {
+                  _startDate = _startDate.add(new Duration(days: 1));
+                  _endDate = _endDate.add(new Duration(days: 1));
+                });
+              },
             ),
           ],
-          header: const Text('资源负载图'),
+          header: Row(
+            children: [
+              Text('资源负载图'),
+              Padding(padding: EdgeInsets.fromLTRB(0, 0, 10, 0)),
+              ..._colorLegend(),
+            ],
+          ),
           rowsPerPage: _rowsPerPage,
           onRowsPerPageChanged: (int value) {
             setState(() {
@@ -100,7 +142,6 @@ class _ResourceLoadChartState extends State<ResourceLoadChart> {
             });
           },
           sortColumnIndex: _sortColumnIndex,
-          /*当前主排序的列的index*/
           sortAscending: _sortAscending,
           onSelectAll: _dessertsDataSource._selectAll,
           columns: <DataColumn>[
@@ -119,7 +160,6 @@ class _ResourceLoadChartState extends State<ResourceLoadChart> {
 }
 
 class DessertDataSource extends DataTableSource {
-/*ascending 上升 这里排序 没看懂比较的是个啥*/
   void _sort<T>(Comparable<T> getField(ResourceLoad d), bool ascending) {
     desserts.sort((ResourceLoad a, ResourceLoad b) {
       if (!ascending) {
@@ -153,19 +193,38 @@ class DessertDataSource extends DataTableSource {
         },
         cells: <DataCell>[
           DataCell(Text('${dessert.name}')),
-          ...dessert.loadList.map((e) => DataCell(Text('$e'))),
+          ...dessert.loadList.map(_transform),
         ]);
   }
 
-  // TODO: implement isRowCountApproximate
+  Color _progressColor(double loadRate) {
+    int i = (loadRate / 20).truncate();
+    int len = progressColors.length;
+    return progressColors[i >= len ? len - 1 : i];
+  }
+
+  DataCell _transform(double loadRate) {
+    double percent = loadRate / 100;
+    String centerStr = '$loadRate%';
+
+    return DataCell(LinearPercentIndicator(
+      width: 200,
+      lineHeight: 30.0,
+      animation: true,
+      animationDuration: 500,
+      percent: percent > 1.0 ? 1.0 : percent,
+      center: Text(centerStr),
+      progressColor: _progressColor(loadRate),
+      linearStrokeCap: LinearStrokeCap.roundAll,
+    ));
+  }
+
   @override
   bool get isRowCountApproximate => false;
 
-  // TODO: implement rowCount
   @override
   int get rowCount => desserts.length;
 
-  // TODO: implement selectedRowCount
   @override
   int get selectedRowCount => _selectedCount;
 
