@@ -4,7 +4,7 @@ import 'package:date_utils/date_utils.dart';
 import 'product_gantt_page.dart';
 import 'dart:math';
 
-import '../../models/models.dart';
+import '../../models/mock.dart';
 
 class GranttChartScreen extends StatefulWidget {
   @override

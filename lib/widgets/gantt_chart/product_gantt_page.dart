@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:date_utils/date_utils.dart';
 import 'dart:math';
 
-import '../../models/models.dart';
+import '../../models/mock.dart';
 
 class ProductGanttPage extends StatefulWidget {
   @override

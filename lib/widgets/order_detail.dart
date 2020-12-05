@@ -1,6 +1,6 @@
 import 'package:crossplatform/common/colors.dart';
 import 'package:crossplatform/common/helpers.dart';
-import 'package:crossplatform/models/models.dart';
+import 'package:crossplatform/models/mock.dart';
 import 'package:crossplatform/models/order.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';

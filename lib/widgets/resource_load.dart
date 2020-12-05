@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:crossplatform/common/helpers.dart';
 import 'package:crossplatform/common/colors.dart';
-import 'package:crossplatform/models/models.dart';
+import 'package:crossplatform/models/mock.dart';
 import 'package:crossplatform/models/resource.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
