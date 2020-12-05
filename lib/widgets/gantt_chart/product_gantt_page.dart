@@ -1,3 +1,4 @@
+import 'package:crossplatform/models/product.dart';
 import 'package:flutter/material.dart';
 import 'package:date_utils/date_utils.dart';
 import 'dart:math';

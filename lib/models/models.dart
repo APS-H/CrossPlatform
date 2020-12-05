@@ -1,6 +1,51 @@
+import 'package:crossplatform/models/order.dart';
 import 'package:crossplatform/models/resource.dart';
 
-final List<ResourceLoad> desserts = <ResourceLoad>[
+final List<OrderData> orders = <OrderData>[
+  OrderData(
+      '418575',
+      [
+        ProgressData('装配', 1),
+      ],
+      false),
+  OrderData(
+      '418577',
+      [
+        ProgressData('装配', 1),
+      ],
+      false),
+  OrderData(
+      '764486',
+      [
+        ProgressData('装配', 0.6),
+      ],
+      true),
+  OrderData(
+    '762904',
+    [
+      ProgressData('装配', 0.23),
+      ProgressData('测试', 0.18),
+    ],
+    false,
+  ),
+  OrderData(
+      '418477',
+      [
+        ProgressData('装配', 0.23),
+        ProgressData('测试', 0),
+      ],
+      false),
+  OrderData(
+    '418006',
+    [
+      ProgressData('装配', 0.20),
+      ProgressData('测试', 0.18),
+    ],
+    true,
+  ),
+];
+
+final List<ResourceLoad> resources = <ResourceLoad>[
   ResourceLoad('Frozen yogurt', [159, 6.0, 24, 4.0, 87, 14, 1]),
   ResourceLoad('Ice cream sandwich', [237, 9.0, 37, 4.3, 129, 8, 1]),
   ResourceLoad('Eclair', [262, 16.0, 24, 6.0, 337, 6, 7]),
@@ -12,8 +57,7 @@ final List<ResourceLoad> desserts = <ResourceLoad>[
   ResourceLoad('Donut', [452, 25.0, 51, 4.9, 326, 2, 22]),
   ResourceLoad('KitKat', [518, 26.0, 65, 7.0, 54, 12, 6]),
   ResourceLoad('Frozen yogurt with sugar', [168, 6.0, 26, 4.0, 87, 14, 1]),
-  ResourceLoad(
-      'Ice cream sandwich with sugar', [246, 9.0, 39, 4.3, 129, 8, 1]),
+  ResourceLoad('Ice cream sandwich with sugar', [246, 9.0, 39, 4.3, 129, 8, 1]),
   ResourceLoad('Eclair with sugar', [271, 16.0, 26, 6.0, 337, 6, 7]),
   ResourceLoad('Cupcake with sugar', [314, 3.7, 69, 4.3, 413, 3, 8]),
   ResourceLoad('Gingerbread with sugar', [345, 16.0, 51, 3.9, 327, 7, 16]),
@@ -23,8 +67,7 @@ final List<ResourceLoad> desserts = <ResourceLoad>[
   ResourceLoad('Donut with sugar', [461, 25.0, 53, 4.9, 326, 2, 22]),
   ResourceLoad('KitKat with sugar', [527, 26.0, 67, 7.0, 54, 12, 6]),
   ResourceLoad('Frozen yogurt with honey', [223, 6.0, 36, 4.0, 87, 14, 1]),
-  ResourceLoad(
-      'Ice cream sandwich with honey', [301, 9.0, 49, 4.3, 129, 8, 1]),
+  ResourceLoad('Ice cream sandwich with honey', [301, 9.0, 49, 4.3, 129, 8, 1]),
   ResourceLoad('Eclair with honey', [326, 16.0, 36, 6.0, 337, 6, 7]),
   ResourceLoad('Cupcake with honey', [369, 3.7, 79, 4.3, 413, 3, 8]),
   ResourceLoad('Gingerbread with honey', [420, 16.0, 61, 3.9, 327, 7, 16]),
@@ -46,35 +89,16 @@ final List<ResourceLoad> desserts = <ResourceLoad>[
   ResourceLoad('KitKat with milk', [621, 28.4, 77, 15.0, 161, 42, 6]),
   ResourceLoad(
       'Coconut slice and frozen yogurt', [318, 21.0, 31, 5.5, 96, 14, 7]),
-  ResourceLoad('Coconut slice and ice cream sandwich',
-      [396, 24.0, 44, 5.8, 138, 8, 7]),
+  ResourceLoad(
+      'Coconut slice and ice cream sandwich', [396, 24.0, 44, 5.8, 138, 8, 7]),
   ResourceLoad('Coconut slice and eclair', [421, 31.0, 31, 7.5, 346, 6, 13]),
   ResourceLoad('Coconut slice and cupcake', [464, 18.7, 74, 5.8, 422, 3, 14]),
   ResourceLoad(
       'Coconut slice and gingerbread', [515, 31.0, 56, 5.4, 316, 7, 22]),
-  ResourceLoad(
-      'Coconut slice and jelly bean', [534, 15.0, 101, 1.5, 59, 0, 6]),
+  ResourceLoad('Coconut slice and jelly bean', [534, 15.0, 101, 1.5, 59, 0, 6]),
   ResourceLoad('Coconut slice and lollipop', [551, 15.2, 105, 1.5, 47, 0, 8]),
-  ResourceLoad(
-      'Coconut slice and honeycomb', [567, 18.2, 94, 8.0, 571, 0, 51]),
+  ResourceLoad('Coconut slice and honeycomb', [567, 18.2, 94, 8.0, 571, 0, 51]),
   ResourceLoad('Coconut slice and donut', [611, 40.0, 58, 6.4, 335, 2, 28]),
   ResourceLoad('Coconut slice and KitKat', [677, 41.0, 72, 8.5, 63, 12, 12]),
 ];
 
-class Product {
-  int id;
-  String name;
-
-  Product({this.id, this.name});
-}
-
-class Resource {
-  int id;
-  String name;
-  DateTime startTime;
-  DateTime endTime;
-  List<int> productions;
-
-  Resource(
-      {this.id, this.name, this.startTime, this.endTime, this.productions});
-}

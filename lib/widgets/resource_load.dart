@@ -16,13 +16,17 @@ class ResourceLoadChart extends StatefulWidget {
 }
 
 class _ResourceLoadChartState extends State<ResourceLoadChart> {
-  int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
+  int _rowsPerPage = 15;
+  final _availableRowsPerPage = [10, 15, 20, 30, 50];
 
   int _sortColumnIndex;
   bool _sortAscending = true;
 
   DateTime _startDate;
   DateTime _endDate;
+
+  final ResourceLoadDataSource _resourceLoadDataSource =
+      ResourceLoadDataSource();
 
   @override
   void initState() {
@@ -48,12 +52,9 @@ class _ResourceLoadChartState extends State<ResourceLoadChart> {
     return columns;
   }
 
-  /*数据源*/
-  final DessertDataSource _dessertsDataSource = DessertDataSource();
-
   void _sort<T>(
       Comparable<T> getField(ResourceLoad d), int columnIndex, bool ascending) {
-    _dessertsDataSource._sort<T>(getField, ascending);
+    _resourceLoadDataSource._sort<T>(getField, ascending);
     setState(() {
       _sortColumnIndex = columnIndex;
       _sortAscending = ascending;
@@ -66,13 +67,13 @@ class _ResourceLoadChartState extends State<ResourceLoadChart> {
       legend.add(Padding(
         padding: EdgeInsets.all(10),
         child: LinearPercentIndicator(
-          width: 100,
-          lineHeight: 20.0,
+          width: 85,
+          lineHeight: 30.0,
           animation: false,
           percent: 1.0,
           center: i == progressColors.length - 1
               ? Text('>100%')
-              : Text('${i * 20}%~${(i + 1) * 20}%'),
+              : Text('${i * 20}~${(i + 1) * 20}%'),
           progressColor: progressColors[i],
           linearStrokeCap: LinearStrokeCap.roundAll,
         ),
@@ -88,7 +89,7 @@ class _ResourceLoadChartState extends State<ResourceLoadChart> {
       children: <Widget>[
         PaginatedDataTable(
           showCheckboxColumn: false,
-          availableRowsPerPage: [10, 15, 20, 30, 50],
+          availableRowsPerPage: _availableRowsPerPage,
           actions: <Widget>[
             // IconButton(
             //   icon: Icon(Icons.add),
@@ -143,7 +144,6 @@ class _ResourceLoadChartState extends State<ResourceLoadChart> {
           },
           sortColumnIndex: _sortColumnIndex,
           sortAscending: _sortAscending,
-          onSelectAll: _dessertsDataSource._selectAll,
           columns: <DataColumn>[
             DataColumn(
                 label: const Text('资源名称'),
@@ -152,16 +152,16 @@ class _ResourceLoadChartState extends State<ResourceLoadChart> {
                     (ResourceLoad d) => d.name, columnIndex, ascending)),
             ..._columns(),
           ],
-          source: _dessertsDataSource,
+          source: _resourceLoadDataSource,
         ),
       ],
     );
   }
 }
 
-class DessertDataSource extends DataTableSource {
+class ResourceLoadDataSource extends DataTableSource {
   void _sort<T>(Comparable<T> getField(ResourceLoad d), bool ascending) {
-    desserts.sort((ResourceLoad a, ResourceLoad b) {
+    resources.sort((ResourceLoad a, ResourceLoad b) {
       if (!ascending) {
         final ResourceLoad c = a;
         a = b;
@@ -174,27 +174,14 @@ class DessertDataSource extends DataTableSource {
     notifyListeners();
   }
 
-  int _selectedCount = 0;
-
   @override
   DataRow getRow(int index) {
-    if (index >= desserts.length) return null;
-    final ResourceLoad dessert = desserts[index];
-    return DataRow.byIndex(
-        index: index,
-        selected: dessert.selected,
-        onSelectChanged: (bool value) {
-          if (dessert.selected != value) {
-            _selectedCount += value ? 1 : -1;
-            assert(_selectedCount >= 0);
-            dessert.selected = value;
-            notifyListeners();
-          }
-        },
-        cells: <DataCell>[
-          DataCell(Text('${dessert.name}')),
-          ...dessert.loadList.map(_transform),
-        ]);
+    if (index >= resources.length) return null;
+    final ResourceLoad resource = resources[index];
+    return DataRow.byIndex(index: index, cells: <DataCell>[
+      DataCell(Text('${resource.name}'), onTap: () {}),
+      ...resource.loadList.map(_transform),
+    ]);
   }
 
   Color _progressColor(double loadRate) {
@@ -207,32 +194,29 @@ class DessertDataSource extends DataTableSource {
     double percent = loadRate / 100;
     String centerStr = '$loadRate%';
 
-    return DataCell(LinearPercentIndicator(
-      width: 200,
-      lineHeight: 30.0,
-      animation: true,
-      animationDuration: 500,
-      percent: percent > 1.0 ? 1.0 : percent,
-      center: Text(centerStr),
-      progressColor: _progressColor(loadRate),
-      linearStrokeCap: LinearStrokeCap.roundAll,
-    ));
+    return DataCell(
+      LinearPercentIndicator(
+        width: 200,
+        lineHeight: 30.0,
+        animation: true,
+        animationDuration: 500,
+        percent: percent > 1.0 ? 1.0 : percent,
+        center: Text(centerStr),
+        progressColor: _progressColor(loadRate),
+        linearStrokeCap: LinearStrokeCap.roundAll,
+      ),
+      onTap: () {},
+    );
   }
 
   @override
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => desserts.length;
+  int get rowCount => resources.length;
 
   @override
-  int get selectedRowCount => _selectedCount;
-
-  void _selectAll(bool checked) {
-    for (ResourceLoad dessert in desserts) dessert.selected = checked;
-    _selectedCount = checked ? desserts.length : 0;
-    notifyListeners();
-  }
+  int get selectedRowCount => 0;
 }
 
 class ResourceLoadHumanTable extends StatefulWidget {

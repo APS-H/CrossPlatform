@@ -128,9 +128,3 @@ class BarLoad {
 
   BarLoad(this.resource, this.loadPercent);
 }
-
-// class GaugeSegment {
-//   int load; //如果为0，表示空白；如果为1，表示数据
-//   int load_percent;
-//   GaugeSegment(this.load, this.load_percent);
-// }
