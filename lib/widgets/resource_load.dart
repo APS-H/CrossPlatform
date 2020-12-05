@@ -1,9 +1,139 @@
+import 'dart:math';
+
 import 'package:crossplatform/common/helpers.dart';
 import 'package:crossplatform/common/colors.dart';
 import 'package:crossplatform/models/models.dart';
 import 'package:crossplatform/models/resource.dart';
 import 'package:flutter/material.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:quiver/iterables.dart';
+
+class ResourceLoadSummary extends StatelessWidget {
+  const ResourceLoadSummary(this._dataSource);
+
+  final ResourceLoadDataSource _dataSource;
+
+  double _getLoadSummary(ResourceType type) {
+    int count = 0;
+    double load = 0;
+    for (ResourceLoad rl in _dataSource.resources) {
+      if (rl.type == type) {
+        count += rl.loadList.length;
+        load += rl.loadList.reduce((value, element) => value + element);
+      }
+    }
+    if (count == 0) return 0.0;
+    final s = load / count;
+    return s > 1.0 ? 1.0 : s;
+  }
+
+  List<Widget> _colorLegend() {
+    List<Padding> legend = [];
+    for (int i = 0; i < progressColors.length; i++) {
+      legend.add(Padding(
+        padding: EdgeInsets.all(10),
+        child: LinearPercentIndicator(
+          width: 85,
+          lineHeight: 30.0,
+          animation: false,
+          percent: 1.0,
+          center: i == progressColors.length - 1
+              ? Text('>100%')
+              : Text('${i * 20}~${(i + 1) * 20}%'),
+          progressColor: progressColors[i],
+          linearStrokeCap: LinearStrokeCap.roundAll,
+        ),
+      ));
+    }
+    return legend;
+  }
+
+  Color _progressColor(double loadRate) {
+    int i = (loadRate * 5).truncate();
+    int len = progressColors.length;
+    return progressColors[i >= len ? len - 1 : i];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final humanLoadSummary = _getLoadSummary(ResourceType.humanResource);
+    final equipmentLoadSummary =
+        _getLoadSummary(ResourceType.equipmentResource);
+
+    return Card(
+      child: Container(
+        // width: 300,
+        // height: 100,
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Text(
+                    '资源总负载',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                  ),
+                  ..._colorLegend(),
+                ],
+              ),
+              Row(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(16),
+                    child: CircularPercentIndicator(
+                      radius: 120.0,
+                      lineWidth: 18.0,
+                      animation: true,
+                      percent: humanLoadSummary,
+                      center: Text(
+                        "${humanLoadSummary * 100}%",
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20.0),
+                      ),
+                      footer: new Text(
+                        "人力总负载",
+                        style: new TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 17.0),
+                      ),
+                      circularStrokeCap: CircularStrokeCap.round,
+                      progressColor: _progressColor(humanLoadSummary),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(16),
+                    child: CircularPercentIndicator(
+                      radius: 120.0,
+                      lineWidth: 18.0,
+                      animation: true,
+                      percent: equipmentLoadSummary,
+                      center: Text(
+                        "${equipmentLoadSummary * 100}%",
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20.0),
+                      ),
+                      footer: new Text(
+                        "设备总负载",
+                        style: new TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 17.0),
+                      ),
+                      circularStrokeCap: CircularStrokeCap.round,
+                      progressColor: _progressColor(equipmentLoadSummary),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class ResourceLoadChart extends StatefulWidget {
   const ResourceLoadChart({this.defaultStartDate, this.defaultEndDate});
@@ -25,7 +155,7 @@ class _ResourceLoadChartState extends State<ResourceLoadChart> {
   DateTime _startDate;
   DateTime _endDate;
 
-  final _resourceLoadDataSource = ResourceLoadDataSource();
+  final _resourceLoadDataSource = ResourceLoadDataSource(resources);
 
   @override
   void initState() {
@@ -86,6 +216,7 @@ class _ResourceLoadChartState extends State<ResourceLoadChart> {
     return ListView(
       padding: const EdgeInsets.all(20.0),
       children: <Widget>[
+        ResourceLoadSummary(_resourceLoadDataSource),
         PaginatedDataTable(
           showCheckboxColumn: false,
           availableRowsPerPage: _availableRowsPerPage,
@@ -458,6 +589,10 @@ class _EquipmentResourceTableState extends State<EquipmentResourceTable> {
 }
 
 class ResourceLoadDataSource extends DataTableSource {
+  ResourceLoadDataSource(this.resources);
+
+  List<ResourceLoad> resources;
+
   void _sort<T>(Comparable<T> getField(ResourceLoad d), bool ascending) {
     resources.sort((ResourceLoad a, ResourceLoad b) {
       if (!ascending) {
