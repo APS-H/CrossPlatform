@@ -1,5 +1,6 @@
 import 'package:crossplatform/models/mock.dart';
 import 'package:crossplatform/models/schedule.dart';
+import 'package:crossplatform/common/helpers.dart';
 import 'package:flutter/material.dart';
 
 class ScheduleDetailOrderPlanTable extends StatefulWidget {
@@ -10,9 +11,6 @@ class ScheduleDetailOrderPlanTable extends StatefulWidget {
 
 class _ScheduleDetailOrderPlanTableState
     extends State<ScheduleDetailOrderPlanTable> {
-  int _rowsPerPage = 15;
-  final _availableRowsPerPage = [10, 15, 20, 30, 50];
-
   int _sortColumnIndex;
   bool _sortAscending = true;
 
@@ -33,8 +31,8 @@ class _ScheduleDetailOrderPlanTableState
       padding: const EdgeInsets.all(20.0),
       children: <Widget>[
         PaginatedDataTable(
-          showCheckboxColumn: true,
-          availableRowsPerPage: _availableRowsPerPage,
+          showCheckboxColumn: false,
+          dataRowHeight: 120,
           actions: <Widget>[],
           header: Row(
             children: [
@@ -42,12 +40,7 @@ class _ScheduleDetailOrderPlanTableState
               Padding(padding: EdgeInsets.fromLTRB(0, 0, 10, 0)),
             ],
           ),
-          rowsPerPage: _rowsPerPage,
-          onRowsPerPageChanged: (int value) {
-            setState(() {
-              _rowsPerPage = value;
-            });
-          },
+          rowsPerPage: _orderPlanDataSource.orderPlans.length,
           sortColumnIndex: _sortColumnIndex,
           sortAscending: _sortAscending,
           columns: <DataColumn>[
@@ -86,9 +79,6 @@ class ScheduleDetailOrderProductionTable extends StatefulWidget {
 
 class _ScheduleDetailOrderProductionTableState
     extends State<ScheduleDetailOrderProductionTable> {
-  int _rowsPerPage = 15;
-  final _availableRowsPerPage = [10, 15, 20, 30, 50];
-
   int _sortColumnIndex;
   bool _sortAscending = true;
 
@@ -110,8 +100,7 @@ class _ScheduleDetailOrderProductionTableState
       padding: const EdgeInsets.all(20.0),
       children: <Widget>[
         PaginatedDataTable(
-          showCheckboxColumn: true,
-          availableRowsPerPage: _availableRowsPerPage,
+          showCheckboxColumn: false,
           actions: <Widget>[],
           header: Row(
             children: [
@@ -119,12 +108,7 @@ class _ScheduleDetailOrderProductionTableState
               Padding(padding: EdgeInsets.fromLTRB(0, 0, 10, 0)),
             ],
           ),
-          rowsPerPage: _rowsPerPage,
-          onRowsPerPageChanged: (int value) {
-            setState(() {
-              _rowsPerPage = value;
-            });
-          },
+          rowsPerPage: _orderProductionDataSource.orderProductions.length,
           sortColumnIndex: _sortColumnIndex,
           sortAscending: _sortAscending,
           columns: <DataColumn>[
@@ -156,9 +140,6 @@ class ScheduleDetailProductionTable extends StatefulWidget {
 
 class _ScheduleDetailProductionTableState
     extends State<ScheduleDetailProductionTable> {
-  int _rowsPerPage = 15;
-  final _availableRowsPerPage = [10, 15, 20, 30, 50];
-
   int _sortColumnIndex;
   bool _sortAscending = true;
 
@@ -179,8 +160,8 @@ class _ScheduleDetailProductionTableState
       padding: const EdgeInsets.all(20.0),
       children: <Widget>[
         PaginatedDataTable(
-          showCheckboxColumn: true,
-          availableRowsPerPage: _availableRowsPerPage,
+          showCheckboxColumn: false,
+          dataRowHeight: 120,
           actions: <Widget>[],
           header: Row(
             children: [
@@ -188,12 +169,7 @@ class _ScheduleDetailProductionTableState
               Padding(padding: EdgeInsets.fromLTRB(0, 0, 10, 0)),
             ],
           ),
-          rowsPerPage: _rowsPerPage,
-          onRowsPerPageChanged: (int value) {
-            setState(() {
-              _rowsPerPage = value;
-            });
-          },
+          rowsPerPage: _productionDataSource.productions.length,
           sortColumnIndex: _sortColumnIndex,
           sortAscending: _sortAscending,
           columns: <DataColumn>[
@@ -227,9 +203,6 @@ class ScheduleDetailProductionResourceTable extends StatefulWidget {
 
 class _ScheduleDetailProductionResourceTableState
     extends State<ScheduleDetailProductionResourceTable> {
-  int _rowsPerPage = 15;
-  final _availableRowsPerPage = [10, 15, 20, 30, 50];
-
   int _sortColumnIndex;
   bool _sortAscending = true;
 
@@ -251,8 +224,8 @@ class _ScheduleDetailProductionResourceTableState
       padding: const EdgeInsets.all(20.0),
       children: <Widget>[
         PaginatedDataTable(
-          showCheckboxColumn: true,
-          availableRowsPerPage: _availableRowsPerPage,
+          showCheckboxColumn: false,
+          dataRowHeight: 120,
           actions: <Widget>[],
           header: Row(
             children: [
@@ -260,12 +233,7 @@ class _ScheduleDetailProductionResourceTableState
               Padding(padding: EdgeInsets.fromLTRB(0, 0, 10, 0)),
             ],
           ),
-          rowsPerPage: _rowsPerPage,
-          onRowsPerPageChanged: (int value) {
-            setState(() {
-              _rowsPerPage = value;
-            });
-          },
+          rowsPerPage: _productionResourceDataSource.productionResources.length,
           sortColumnIndex: _sortColumnIndex,
           sortAscending: _sortAscending,
           columns: <DataColumn>[
@@ -321,7 +289,27 @@ class OrderPlanDataSource extends DataTableSource {
       cells: <DataCell>[
         DataCell(Text('${orderPlan.orderId}')),
         DataCell(Text('${orderPlan.productNum}')),
-        DataCell(Text('${orderPlan.schedules.toString()}')),
+        DataCell(
+          Row(
+            children: [
+              ...orderPlan.schedules.map(
+                (e) => Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 32, 0),
+                  child: Column(
+                    children: [
+                      Text('子订单  ：${e.id}'),
+                      Text('产品数量：${e.productNum}'),
+                      Text('开始时间：${dateTimeString(e.startTime)}'),
+                      Text('结束时间：${dateTimeString(e.endTime)}'),
+                    ],
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -372,7 +360,7 @@ class OrderProductionDataSource extends DataTableSource {
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => orderPlans.length;
+  int get rowCount => orderProductions.length;
 
   @override
   int get selectedRowCount => 0;
@@ -404,8 +392,28 @@ class ProductionDataSource extends DataTableSource {
     return DataRow.byIndex(
       index: index,
       cells: <DataCell>[
-        DataCell(Text('${production.productionID}')),
-        DataCell(Text('${production.tasks.toString()}')),
+        DataCell(Text('${production.id}')),
+        DataCell(
+          Row(
+            children: [
+              ...production.tasks.map(
+                (e) => Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 32, 0),
+                  child: Column(
+                    children: [
+                      Text('生产编号：${e.id}'),
+                      Text('产品编号：${e.task}'),
+                      Text('开始时间：${dateTimeString(e.startTime)}'),
+                      Text('结束时间：${dateTimeString(e.endTime)}'),
+                    ],
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -414,7 +422,7 @@ class ProductionDataSource extends DataTableSource {
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => orderPlans.length;
+  int get rowCount => productions.length;
 
   @override
   int get selectedRowCount => 0;
@@ -447,7 +455,26 @@ class ProductionResourceDataSource extends DataTableSource {
       index: index,
       cells: <DataCell>[
         DataCell(Text('${productionResource.productionID}')),
-        DataCell(Text('${productionResource.resources.toString()}')),
+        DataCell(
+          Row(
+            children: [
+              ...productionResource.resources.map(
+                (e) => Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 32, 0),
+                  child: Column(
+                    children: [
+                      Text('资源编号：${e.resourceID}'),
+                      Text('资源类型：${e.resourceType == 0 ? '人力资源' : '设备资源'}'),
+                      Text('资源数量：${e.resourceNum}'),
+                    ],
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -456,7 +483,7 @@ class ProductionResourceDataSource extends DataTableSource {
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => orderPlans.length;
+  int get rowCount => productionResources.length;
 
   @override
   int get selectedRowCount => 0;
