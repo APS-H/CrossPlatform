@@ -52,16 +52,16 @@ class HomePageState extends State<HomePage> {
         body = ResourceLoadChart();
         break;
       case SelectedItem.resourceLoadHumanTable:
-        body = ResourceLoadHumanTable();
+        body = HumanResourceTable();
         break;
       case SelectedItem.resourceLoadEquipmentTable:
-        body = ResourceLoadEquipmentTable();
+        body = EquipmentResourceTable();
         break;
       case SelectedItem.orderDetailChart:
-        body = OrderDetailChart();
+        body = OrderProgressChart();
         break;
       case SelectedItem.orderDetailTable:
-        body = OrderDetailTable();
+        body = OrderTable();
         break;
       case SelectedItem.scheduleDetailOrderPlanTable:
         body = ScheduleDetailOrderPlanTable();

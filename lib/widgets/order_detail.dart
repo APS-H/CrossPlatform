@@ -5,23 +5,23 @@ import 'package:crossplatform/models/order.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
-class OrderDetailChart extends StatefulWidget {
-  const OrderDetailChart({this.defaultDate});
+class OrderProgressChart extends StatefulWidget {
+  const OrderProgressChart({this.defaultDate});
 
   final DateTime defaultDate;
 
   @override
-  _OrderDetailChartState createState() => _OrderDetailChartState();
+  _OrderProgressChartState createState() => _OrderProgressChartState();
 }
 
-class _OrderDetailChartState extends State<OrderDetailChart> {
+class _OrderProgressChartState extends State<OrderProgressChart> {
   int _rowsPerPage = 15;
   final _availableRowsPerPage = [10, 15, 20, 30, 50];
 
   int _sortColumnIndex;
   bool _sortAscending = true;
 
-  final OrderDataSource _ordersDataSource = OrderDataSource();
+  final OrderProgressDataSource _ordersDataSource = OrderProgressDataSource();
   DateTime _currentDate;
 
   @override
@@ -30,8 +30,8 @@ class _OrderDetailChartState extends State<OrderDetailChart> {
     super.initState();
   }
 
-  void _sort<T>(
-      Comparable<T> getField(OrderData d), int columnIndex, bool ascending) {
+  void _sort<T>(Comparable<T> getField(OrderProgress d), int columnIndex,
+      bool ascending) {
     _ordersDataSource._sort<T>(getField, ascending);
     setState(() {
       _sortColumnIndex = columnIndex;
@@ -109,13 +109,13 @@ class _OrderDetailChartState extends State<OrderDetailChart> {
                 label: const Text('订单编号'),
                 tooltip: '订单编号',
                 onSort: (int columnIndex, bool ascending) => _sort<String>(
-                    (OrderData d) => d.id, columnIndex, ascending)),
+                    (OrderProgress d) => d.id, columnIndex, ascending)),
             DataColumn(
                 label: const Text('订单进度'),
                 tooltip: '${dateString(_currentDate)} 订单进度',
                 numeric: true,
                 onSort: (int columnIndex, bool ascending) => _sort<num>(
-                    (OrderData d) => d.crafts[0].percent,
+                    (OrderProgress d) => d.crafts[0].percent,
                     columnIndex,
                     ascending)),
           ],
@@ -126,9 +126,111 @@ class _OrderDetailChartState extends State<OrderDetailChart> {
   }
 }
 
-class OrderDataSource extends DataTableSource {
-  void _sort<T>(Comparable<T> getField(OrderData d), bool ascending) {
-    orders.sort((OrderData a, OrderData b) {
+class OrderTable extends StatefulWidget {
+  @override
+  _OrderTableState createState() => _OrderTableState();
+}
+
+class _OrderTableState extends State<OrderTable> {
+  int _rowsPerPage = 15;
+  final _availableRowsPerPage = [10, 15, 20, 30, 50];
+
+  int _sortColumnIndex;
+  bool _sortAscending = true;
+
+  final _orderDataSource = OrderDataSource(orders);
+
+  void _sort<T>(
+      Comparable<T> getField(Order d), int columnIndex, bool ascending) {
+    _orderDataSource._sort<T>(getField, ascending);
+    setState(() {
+      _sortColumnIndex = columnIndex;
+      _sortAscending = ascending;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(20.0),
+      children: <Widget>[
+        PaginatedDataTable(
+          showCheckboxColumn: true,
+          availableRowsPerPage: _availableRowsPerPage,
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.add),
+              tooltip: '新增订单',
+              onPressed: () {},
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 5),
+            ),
+            IconButton(
+              icon: Icon(Icons.edit),
+              tooltip: '修改订单',
+              onPressed: () {},
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 5),
+            ),
+            IconButton(
+              icon: Icon(Icons.delete),
+              tooltip: '删除订单',
+              onPressed: () {},
+            ),
+          ],
+          header: Row(
+            children: [
+              Text('订单列表'),
+              Padding(padding: EdgeInsets.fromLTRB(0, 0, 10, 0)),
+            ],
+          ),
+          rowsPerPage: _rowsPerPage,
+          onRowsPerPageChanged: (int value) {
+            setState(() {
+              _rowsPerPage = value;
+            });
+          },
+          sortColumnIndex: _sortColumnIndex,
+          sortAscending: _sortAscending,
+          onSelectAll: _orderDataSource._selectAll,
+          columns: <DataColumn>[
+            DataColumn(
+                label: const Text('订单编号'),
+                tooltip: '订单编号',
+                onSort: (int columnIndex, bool ascending) =>
+                    _sort<String>((Order d) => d.id, columnIndex, ascending)),
+            DataColumn(
+                label: const Text('产品编号'),
+                tooltip: '订单生产产品的物料编号',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Order d) => d.productID, columnIndex, ascending)),
+            DataColumn(
+                label: const Text('产品数量'),
+                tooltip: '订单要求生产并交付产品的数量',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Order d) => d.productCount.toString(),
+                    columnIndex,
+                    ascending)),
+            DataColumn(
+                label: const Text('交付日期'),
+                tooltip: '约定产品交付日期',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Order d) => dateString(d.deliveryDate),
+                    columnIndex,
+                    ascending)),
+          ],
+          source: _orderDataSource,
+        ),
+      ],
+    );
+  }
+}
+
+class OrderProgressDataSource extends DataTableSource {
+  void _sort<T>(Comparable<T> getField(OrderProgress d), bool ascending) {
+    ordersProgress.sort((OrderProgress a, OrderProgress b) {
       if (!ascending) {
         final c = a;
         a = b;
@@ -141,7 +243,7 @@ class OrderDataSource extends DataTableSource {
     notifyListeners();
   }
 
-  Widget _buildCell(OrderData data) {
+  Widget _buildCell(OrderProgress data) {
     return Padding(
       padding: EdgeInsets.all(16.0),
       child: Row(
@@ -166,8 +268,8 @@ class OrderDataSource extends DataTableSource {
 
   @override
   DataRow getRow(int index) {
-    if (index >= orders.length) return null;
-    final OrderData order = orders[index];
+    if (index >= ordersProgress.length) return null;
+    final OrderProgress order = ordersProgress[index];
     return DataRow.byIndex(index: index, cells: <DataCell>[
       DataCell(Text('订单${order.id}'), onTap: () {}),
       DataCell(_buildCell(order), onTap: () {}),
@@ -189,14 +291,62 @@ class OrderDataSource extends DataTableSource {
   int get selectedRowCount => 0;
 }
 
-class OrderDetailTable extends StatefulWidget {
-  @override
-  _OrderDetailTableState createState() => _OrderDetailTableState();
-}
+class OrderDataSource extends DataTableSource {
+  OrderDataSource(this.orders);
 
-class _OrderDetailTableState extends State<OrderDetailTable> {
+  List<Order> orders;
+  int _selectedCount = 0;
+
+  void _sort<T>(Comparable<T> getField(Order d), bool ascending) {
+    orders.sort((Order a, Order b) {
+      if (!ascending) {
+        final c = a;
+        a = b;
+        b = c;
+      }
+      final Comparable<T> aValue = getField(a);
+      final Comparable<T> bValue = getField(b);
+      return Comparable.compare(aValue, bValue);
+    });
+    notifyListeners();
+  }
+
   @override
-  Widget build(BuildContext context) {
-    return Container(child: Text('Order Detail Table'));
+  DataRow getRow(int index) {
+    if (index >= orders.length) return null;
+    final Order order = orders[index];
+    return DataRow.byIndex(
+      index: index,
+      selected: order.selected,
+      onSelectChanged: (bool value) {
+        if (order.selected != value) {
+          _selectedCount += value ? 1 : -1;
+          assert(_selectedCount >= 0);
+          order.selected = value;
+          notifyListeners();
+        }
+      },
+      cells: <DataCell>[
+        DataCell(Text('${order.id}')),
+        DataCell(Text('${order.productID}')),
+        DataCell(Text('${order.productCount}')),
+        DataCell(Text('${dateString(order.deliveryDate)}')),
+      ],
+    );
+  }
+
+  @override
+  bool get isRowCountApproximate => false;
+
+  @override
+  int get rowCount => orders.length;
+
+  @override
+  int get selectedRowCount => _selectedCount;
+
+  void _selectAll(bool checked) {
+    for (Order r in orders) r.selected = checked;
+    _selectedCount = checked ? orders.length : 0;
+    notifyListeners();
   }
 }

@@ -6,3 +6,14 @@ class ResourceLoad {
 
   bool selected = false;
 }
+
+class Resource {
+  Resource(this.name, this.count, this.shift, this.workDays);
+
+  String name;
+  int count;
+  int shift;
+  List<int> workDays;
+
+  bool selected = false;
+}

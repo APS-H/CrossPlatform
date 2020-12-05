@@ -25,8 +25,7 @@ class _ResourceLoadChartState extends State<ResourceLoadChart> {
   DateTime _startDate;
   DateTime _endDate;
 
-  final ResourceLoadDataSource _resourceLoadDataSource =
-      ResourceLoadDataSource();
+  final _resourceLoadDataSource = ResourceLoadDataSource();
 
   @override
   void initState() {
@@ -91,21 +90,6 @@ class _ResourceLoadChartState extends State<ResourceLoadChart> {
           showCheckboxColumn: false,
           availableRowsPerPage: _availableRowsPerPage,
           actions: <Widget>[
-            // IconButton(
-            //   icon: Icon(Icons.add),
-            //   tooltip: '新增资源',
-            //   onPressed: () {},
-            // ),
-            // IconButton(
-            //   icon: Icon(Icons.edit),
-            //   tooltip: '修改资源',
-            //   onPressed: () {},
-            // ),
-            // IconButton(
-            //   icon: Icon(Icons.delete),
-            //   tooltip: '删除资源',
-            //   onPressed: () {},
-            // ),
             IconButton(
               icon: Icon(Icons.arrow_back_ios),
               tooltip: '往前一天',
@@ -159,6 +143,320 @@ class _ResourceLoadChartState extends State<ResourceLoadChart> {
   }
 }
 
+class HumanResourceTable extends StatefulWidget {
+  @override
+  _HumanResourceTableState createState() => _HumanResourceTableState();
+}
+
+class _HumanResourceTableState extends State<HumanResourceTable> {
+  int _rowsPerPage = 15;
+  final _availableRowsPerPage = [10, 15, 20, 30, 50];
+
+  int _sortColumnIndex;
+  bool _sortAscending = true;
+
+  final _humanResourceDataSource = ResourceDataSource(humanResources);
+
+  List<Widget> _shiftLegend() {
+    return [
+      ...shiftMap.values.map((e) => Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child: Text(
+                '${e.name}: ${timeString(e.startTime)}~${timeString(e.endTime)}'),
+          ))
+    ];
+  }
+
+  void _sort<T>(
+      Comparable<T> getField(Resource d), int columnIndex, bool ascending) {
+    _humanResourceDataSource._sort<T>(getField, ascending);
+    setState(() {
+      _sortColumnIndex = columnIndex;
+      _sortAscending = ascending;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(20.0),
+      children: <Widget>[
+        PaginatedDataTable(
+          showCheckboxColumn: true,
+          availableRowsPerPage: _availableRowsPerPage,
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.add),
+              tooltip: '新增资源',
+              onPressed: () {},
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 5),
+            ),
+            IconButton(
+              icon: Icon(Icons.edit),
+              tooltip: '修改资源',
+              onPressed: () {},
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 5),
+            ),
+            IconButton(
+              icon: Icon(Icons.delete),
+              tooltip: '删除资源',
+              onPressed: () {},
+            ),
+          ],
+          header: Row(
+            children: [
+              Text('人力资源列表'),
+              Padding(padding: EdgeInsets.fromLTRB(0, 0, 10, 0)),
+              ..._shiftLegend(),
+            ],
+          ),
+          rowsPerPage: _rowsPerPage,
+          onRowsPerPageChanged: (int value) {
+            setState(() {
+              _rowsPerPage = value;
+            });
+          },
+          sortColumnIndex: _sortColumnIndex,
+          sortAscending: _sortAscending,
+          onSelectAll: _humanResourceDataSource._selectAll,
+          columns: <DataColumn>[
+            DataColumn(
+                label: const Text('人组名称'),
+                tooltip: '人力资源组名称',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Resource d) => d.name, columnIndex, ascending)),
+            DataColumn(
+                label: const Text('组人数'),
+                tooltip: '人力资源组人数',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Resource d) => d.count.toString(),
+                    columnIndex,
+                    ascending)),
+            DataColumn(
+                label: const Text('排班类型'),
+                tooltip: '人力资源组排班（早班、晚班、全天）',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Resource d) => d.shift.toString(),
+                    columnIndex,
+                    ascending)),
+            DataColumn(
+                label: const Text('周一'),
+                tooltip: '人力资源组周一是否工作',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Resource d) => d.workDays.contains(1).toString(),
+                    columnIndex,
+                    ascending)),
+            DataColumn(
+                label: const Text('周二'),
+                tooltip: '人力资源组周二是否工作',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Resource d) => d.workDays.contains(2).toString(),
+                    columnIndex,
+                    ascending)),
+            DataColumn(
+                label: const Text('周三'),
+                tooltip: '人力资源组周三是否工作',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Resource d) => d.workDays.contains(3).toString(),
+                    columnIndex,
+                    ascending)),
+            DataColumn(
+                label: const Text('周四'),
+                tooltip: '人力资源组周四是否工作',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Resource d) => d.workDays.contains(4).toString(),
+                    columnIndex,
+                    ascending)),
+            DataColumn(
+                label: const Text('周五'),
+                tooltip: '人力资源组周五是否工作',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Resource d) => d.workDays.contains(5).toString(),
+                    columnIndex,
+                    ascending)),
+            DataColumn(
+                label: const Text('周六'),
+                tooltip: '人力资源组周六是否工作',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Resource d) => d.workDays.contains(6).toString(),
+                    columnIndex,
+                    ascending)),
+            DataColumn(
+                label: const Text('周日'),
+                tooltip: '人力资源组周日是否工作',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Resource d) => d.workDays.contains(7).toString(),
+                    columnIndex,
+                    ascending)),
+          ],
+          source: _humanResourceDataSource,
+        ),
+      ],
+    );
+  }
+}
+
+class EquipmentResourceTable extends StatefulWidget {
+  @override
+  _EquipmentResourceTableState createState() => _EquipmentResourceTableState();
+}
+
+class _EquipmentResourceTableState extends State<EquipmentResourceTable> {
+  int _rowsPerPage = 15;
+  final _availableRowsPerPage = [10, 15, 20, 30, 50];
+
+  int _sortColumnIndex;
+  bool _sortAscending = true;
+
+  final _equipmentResourceDataSource = ResourceDataSource(equipmentResource);
+
+  List<Widget> _shiftLegend() {
+    return [
+      ...shiftMap.values.map((e) => Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child: Text(
+                '${e.name}: ${timeString(e.startTime)}~${timeString(e.endTime)}'),
+          ))
+    ];
+  }
+
+  void _sort<T>(
+      Comparable<T> getField(Resource d), int columnIndex, bool ascending) {
+    _equipmentResourceDataSource._sort<T>(getField, ascending);
+    setState(() {
+      _sortColumnIndex = columnIndex;
+      _sortAscending = ascending;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(20.0),
+      children: <Widget>[
+        PaginatedDataTable(
+          showCheckboxColumn: true,
+          availableRowsPerPage: _availableRowsPerPage,
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.add),
+              tooltip: '新增资源',
+              onPressed: () {},
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 5),
+            ),
+            IconButton(
+              icon: Icon(Icons.edit),
+              tooltip: '修改资源',
+              onPressed: () {},
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 5),
+            ),
+            IconButton(
+              icon: Icon(Icons.delete),
+              tooltip: '删除资源',
+              onPressed: () {},
+            ),
+          ],
+          header: Row(
+            children: [
+              Text('设备资源列表'),
+              Padding(padding: EdgeInsets.fromLTRB(0, 0, 10, 0)),
+              ..._shiftLegend(),
+            ],
+          ),
+          rowsPerPage: _rowsPerPage,
+          onRowsPerPageChanged: (int value) {
+            setState(() {
+              _rowsPerPage = value;
+            });
+          },
+          sortColumnIndex: _sortColumnIndex,
+          sortAscending: _sortAscending,
+          onSelectAll: _equipmentResourceDataSource._selectAll,
+          columns: <DataColumn>[
+            DataColumn(
+                label: const Text('设备名称'),
+                tooltip: '设备资源名称',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Resource d) => d.name, columnIndex, ascending)),
+            DataColumn(
+                label: const Text('设备数量'),
+                tooltip: '设备资源数量',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Resource d) => d.count.toString(),
+                    columnIndex,
+                    ascending)),
+            DataColumn(
+                label: const Text('排班类型'),
+                tooltip: '设备资源排班（早班、晚班、全天）',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Resource d) => d.shift.toString(),
+                    columnIndex,
+                    ascending)),
+            DataColumn(
+                label: const Text('周一'),
+                tooltip: '设备资源周一是否工作',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Resource d) => d.workDays.contains(1).toString(),
+                    columnIndex,
+                    ascending)),
+            DataColumn(
+                label: const Text('周二'),
+                tooltip: '设备资源周二是否工作',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Resource d) => d.workDays.contains(2).toString(),
+                    columnIndex,
+                    ascending)),
+            DataColumn(
+                label: const Text('周三'),
+                tooltip: '设备资源周三是否工作',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Resource d) => d.workDays.contains(3).toString(),
+                    columnIndex,
+                    ascending)),
+            DataColumn(
+                label: const Text('周四'),
+                tooltip: '设备资源周四是否工作',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Resource d) => d.workDays.contains(4).toString(),
+                    columnIndex,
+                    ascending)),
+            DataColumn(
+                label: const Text('周五'),
+                tooltip: '设备资源周五是否工作',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Resource d) => d.workDays.contains(5).toString(),
+                    columnIndex,
+                    ascending)),
+            DataColumn(
+                label: const Text('周六'),
+                tooltip: '设备资源周六是否工作',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Resource d) => d.workDays.contains(6).toString(),
+                    columnIndex,
+                    ascending)),
+            DataColumn(
+                label: const Text('周日'),
+                tooltip: '设备资源周日是否工作',
+                onSort: (int columnIndex, bool ascending) => _sort<String>(
+                    (Resource d) => d.workDays.contains(7).toString(),
+                    columnIndex,
+                    ascending)),
+          ],
+          source: _equipmentResourceDataSource,
+        ),
+      ],
+    );
+  }
+}
+
 class ResourceLoadDataSource extends DataTableSource {
   void _sort<T>(Comparable<T> getField(ResourceLoad d), bool ascending) {
     resources.sort((ResourceLoad a, ResourceLoad b) {
@@ -178,10 +476,13 @@ class ResourceLoadDataSource extends DataTableSource {
   DataRow getRow(int index) {
     if (index >= resources.length) return null;
     final ResourceLoad resource = resources[index];
-    return DataRow.byIndex(index: index, cells: <DataCell>[
-      DataCell(Text('${resource.name}'), onTap: () {}),
-      ...resource.loadList.map(_transform),
-    ]);
+    return DataRow.byIndex(
+      index: index,
+      cells: <DataCell>[
+        DataCell(Text('${resource.name}'), onTap: () {}),
+        ...resource.loadList.map(_transform),
+      ],
+    );
   }
 
   Color _progressColor(double loadRate) {
@@ -219,28 +520,71 @@ class ResourceLoadDataSource extends DataTableSource {
   int get selectedRowCount => 0;
 }
 
-class ResourceLoadHumanTable extends StatefulWidget {
-  @override
-  _ResourceLoadHumanTableState createState() => _ResourceLoadHumanTableState();
-}
+class ResourceDataSource extends DataTableSource {
+  ResourceDataSource(this.resources);
 
-class _ResourceLoadHumanTableState extends State<ResourceLoadHumanTable> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(child: Text('Resource Load Human Table'));
+  List<Resource> resources;
+  int _selectedCount = 0;
+
+  void _sort<T>(Comparable<T> getField(Resource d), bool ascending) {
+    resources.sort((Resource a, Resource b) {
+      if (!ascending) {
+        final c = a;
+        a = b;
+        b = c;
+      }
+      final Comparable<T> aValue = getField(a);
+      final Comparable<T> bValue = getField(b);
+      return Comparable.compare(aValue, bValue);
+    });
+    notifyListeners();
   }
-}
 
-class ResourceLoadEquipmentTable extends StatefulWidget {
-  @override
-  _ResourceLoadEquipmentTableState createState() =>
-      _ResourceLoadEquipmentTableState();
-}
+  List<DataCell> _workDays(List<int> workDays) {
+    List<DataCell> row = [];
+    for (int i = 1; i <= 7; i++) {
+      row.add(
+          workDays.contains(i) ? DataCell(Icon(Icons.check)) : DataCell.empty);
+    }
+    return row;
+  }
 
-class _ResourceLoadEquipmentTableState
-    extends State<ResourceLoadEquipmentTable> {
   @override
-  Widget build(BuildContext context) {
-    return Container(child: Text('Resource Load Equipment Table'));
+  DataRow getRow(int index) {
+    if (index >= resources.length) return null;
+    final Resource resource = resources[index];
+    return DataRow.byIndex(
+      index: index,
+      selected: resource.selected,
+      onSelectChanged: (bool value) {
+        if (resource.selected != value) {
+          _selectedCount += value ? 1 : -1;
+          assert(_selectedCount >= 0);
+          resource.selected = value;
+          notifyListeners();
+        }
+      },
+      cells: <DataCell>[
+        DataCell(Text('${resource.name}')),
+        DataCell(Text('${resource.count}')),
+        DataCell(Text('${shiftMap[resource.shift].name}')),
+        ..._workDays(resource.workDays),
+      ],
+    );
+  }
+
+  @override
+  bool get isRowCountApproximate => false;
+
+  @override
+  int get rowCount => resources.length;
+
+  @override
+  int get selectedRowCount => _selectedCount;
+
+  void _selectAll(bool checked) {
+    for (Resource r in resources) r.selected = checked;
+    _selectedCount = checked ? resources.length : 0;
+    notifyListeners();
   }
 }

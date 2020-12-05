@@ -1,48 +1,144 @@
 import 'package:crossplatform/models/order.dart';
 import 'package:crossplatform/models/resource.dart';
+import 'package:crossplatform/models/shift.dart';
+import 'package:flutter/material.dart';
 
-final List<OrderData> orders = <OrderData>[
-  OrderData(
-      '418575',
-      [
-        ProgressData('装配', 1),
-      ],
-      false),
-  OrderData(
-      '418577',
-      [
-        ProgressData('装配', 1),
-      ],
-      false),
-  OrderData(
-      '764486',
-      [
-        ProgressData('装配', 0.6),
-      ],
-      true),
-  OrderData(
-    '762904',
-    [
-      ProgressData('装配', 0.23),
-      ProgressData('测试', 0.18),
-    ],
-    false,
-  ),
-  OrderData(
-      '418477',
-      [
-        ProgressData('装配', 0.23),
-        ProgressData('测试', 0),
-      ],
-      false),
-  OrderData(
-    '418006',
-    [
-      ProgressData('装配', 0.20),
-      ProgressData('测试', 0.18),
-    ],
-    true,
-  ),
+final shiftMap = {
+  0: Shift("早班", TimeOfDay(hour: 7, minute: 0), TimeOfDay(hour: 19, minute: 0)),
+  1: Shift("晚班", TimeOfDay(hour: 19, minute: 0), TimeOfDay(hour: 7, minute: 0)),
+  2: Shift(
+      "全天", TimeOfDay(hour: 0, minute: 0), TimeOfDay(hour: 23, minute: 59)),
+};
+
+final List<Resource> humanResources = <Resource>[
+  Resource("10组-陈  云（5）", 5, 0, [1, 2, 3, 4, 5]),
+  Resource("11组-张  娟（4）", 4, 0, [1, 2, 3, 4, 5]),
+  Resource("12组-姚兰（5）", 5, 1, [1, 2, 3, 4, 5]),
+  Resource("13组-刘燕（3）", 3, 0, [1, 2, 3, 4, 5]),
+  Resource("14组-周  清（4）", 4, 0, [1, 2, 3, 4, 5]),
+  Resource("15组-李娟（5）", 5, 1, [1, 2, 3, 4, 5]),
+  Resource("16组-朱美（4）", 4, 1, [1, 2, 3, 4, 5]),
+  Resource("17组-吴凤（4）", 4, 0, [1, 2, 3, 4, 5]),
+  Resource("18组-芮  娜（3）", 3, 1, [1, 2, 3, 4, 5]),
+  Resource("19组-王  秀（3）", 3, 1, [1, 2, 3, 4, 5]),
+  Resource("1组-彭慧（5）", 5, 1, [1, 2, 3, 4, 5]),
+  Resource("20组-王梅（4）", 4, 1, [1, 2, 3, 4, 5]),
+  Resource("21组-陈花（4）", 4, 0, [1, 2, 3, 4, 5]),
+  Resource("22组-陈霞（3）", 3, 0, [1, 2, 3, 4, 5]),
+  Resource("23组-吴凤（4）", 3, 1, [1, 2, 3, 4, 5]),
+  Resource("24组-张 娟1（3）", 3, 0, [1, 2, 3, 4, 5]),
+  Resource("26组-杨  丽（5）", 5, 0, [1, 2, 3, 4, 5]),
+  Resource("27组-徐燕（5）", 5, 0, [1, 2, 3, 4, 5]),
+  Resource("28组-杜珍（4）", 4, 1, [1, 2, 3, 4, 5]),
+  Resource("2组-丁梅（3）", 3, 1, [1, 2, 3, 4, 5]),
+  Resource("30组-陈  梅（4）", 4, 1, [1, 2, 3, 4, 5]),
+  Resource("31组-史玲（4）", 4, 1, [1, 2, 3, 4, 5]),
+  Resource("33组-许萍（5）", 5, 0, [1, 2, 3, 4, 5]),
+  Resource("36组-谢霞（4）", 4, 0, [1, 2, 3, 4, 5]),
+  Resource("39组-刘  霞（3）", 3, 0, [1, 2, 3, 4, 5]),
+  Resource("3组-李翠（4）", 4, 0, [1, 2, 3, 4, 5]),
+  Resource("40组-高燕（5）", 5, 0, [1, 2, 3, 4, 5]),
+  Resource("4组-赵勤（3）", 3, 0, [1, 2, 3, 4, 5]),
+  Resource("6组-李  倩（4）", 4, 1, [1, 2, 3, 4, 5]),
+  Resource("7组-黄娣（4）", 4, 0, [1, 2, 3, 4, 5]),
+  Resource("8组-张萍（4）", 4, 0, [1, 2, 3, 4, 5]),
+  Resource("9组-张敏（5）", 5, 0, [1, 2, 3, 4, 5]),
+  Resource("UKK组-王娣（6）", 6, 0, [1, 2, 3, 4, 5]),
+  Resource("5组-童玲（5）", 5, 0, [1, 2, 3, 4, 5]),
+];
+
+final List<Resource> equipmentResource = <Resource>[
+  Resource("line01", 3, 2, [1, 2, 3, 4, 5]),
+  Resource("line02", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line03", 3, 2, [1, 2, 3, 4, 5]),
+  Resource("line04", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line05", 5, 2, [1, 2, 3, 4, 5]),
+  Resource("line06", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line07", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line08", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line10", 3, 2, [1, 2, 3, 4, 5]),
+  Resource("line11", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line12", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line14", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line15", 1, 2, [1, 2, 3, 4, 5]),
+  Resource("line17", 3, 2, [1, 2, 3, 4, 5]),
+  Resource("line18", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line19", 3, 2, [1, 2, 3, 4, 5]),
+  Resource("line20", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line30", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line31", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line32", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line33", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line34", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line35", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line36", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line37", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line38", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line39", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line40", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line41", 4, 2, [1, 2, 3, 4, 5]),
+  Resource("line42", 5, 2, [1, 2, 3, 4, 5]),
+  Resource("line43", 1, 2, [1, 2, 3, 4, 5]),
+  Resource("弹片机(3)", 3, 2, [1, 2, 3, 4, 5, 6, 7]),
+  Resource("电阻测试机(2)", 2, 2, [1, 2, 3, 4, 5, 6, 7]),
+  Resource("移印机(1)", 1, 2, [1, 2, 3, 4, 5, 6, 7]),
+  Resource("自动包装机(2)", 2, 2, [1, 2, 3, 4, 5, 6, 7]),
+  Resource("高电压测试机(5)", 5, 2, [1, 2, 3, 4, 5, 6, 7])
+];
+
+final List<OrderProgress> ordersProgress = <OrderProgress>[
+  OrderProgress('418575', [
+    Progress('装配', 1),
+  ]),
+  OrderProgress('418577', [
+    Progress('装配', 1),
+  ]),
+  OrderProgress('764486', [
+    Progress('装配', 0.6),
+  ]),
+  OrderProgress('762904', [
+    Progress('装配', 0.23),
+    Progress('测试', 0.18),
+  ]),
+  OrderProgress('418477', [
+    Progress('装配', 0.23),
+    Progress('测试', 0),
+  ]),
+  OrderProgress('418006', [
+    Progress('装配', 0.20),
+    Progress('测试', 0.18),
+  ]),
+];
+
+final List<Order> orders = <Order>[
+  Order("418477", "3246515", 7700, DateTime(2018, 11, 9)),
+  Order("418006", "1413036", 44600, DateTime(2018, 11, 9)),
+  Order("764486", "1413036", 30000, DateTime(2018, 11, 9)),
+  Order("418575", "3246515", 8400, DateTime(2018, 11, 9)),
+  Order("418351", "3247967", 100, DateTime(2018, 11, 9)),
+  Order("764374", "3247967", 200, DateTime(2018, 11, 14)),
+  Order("418483", "3246418", 3200, DateTime(2018, 11, 14)),
+  Order("418322", "3048823", 6000, DateTime(2018, 11, 14)),
+  Order("763623", "3213124", 100, DateTime(2018, 11, 14)),
+  Order("417642", "3213124", 1500, DateTime(2018, 11, 15)),
+  Order("418194", "3005840", 200, DateTime(2018, 11, 15)),
+  Order("762904", "3005840", 4800, DateTime(2018, 11, 15)),
+  Order("414837", "3005837", 6400, DateTime(2018, 11, 15)),
+  Order("418433", "3246418", 5500, DateTime(2018, 11, 15)),
+  Order("418652", "3048823", 5000, DateTime(2018, 11, 16)),
+  Order("762917", "3050015", 8100, DateTime(2018, 11, 19)),
+  Order("764104", "3211498", 4000, DateTime(2018, 11, 19)),
+  Order("764104", "3211498", 1900, DateTime(2018, 11, 20)),
+  Order("764310", "3211498", 2100, DateTime(2018, 11, 20)),
+  Order("764098", "3209248", 1620, DateTime(2018, 11, 21)),
+  Order("764087", "3000607", 3400, DateTime(2018, 11, 22)),
+  Order("417194", "3000607", 500, DateTime(2018, 11, 22)),
+  Order("763131", "3050015", 2700, DateTime(2018, 11, 23)),
+  Order("417174", "3059786", 11400, DateTime(2018, 12, 5)),
+  Order("762485", "3209248", 1980, DateTime(2018, 12, 16)),
+  Order("762838", "1302215", 21000, DateTime(2018, 12, 7)),
+  Order("417830", "3031238", 5000, DateTime(2018, 12, 18)),
+  Order("416621", "3036466", 3250, DateTime(2018, 12, 20)),
 ];
 
 final List<ResourceLoad> resources = <ResourceLoad>[
@@ -101,4 +197,3 @@ final List<ResourceLoad> resources = <ResourceLoad>[
   ResourceLoad('Coconut slice and donut', [611, 40.0, 58, 6.4, 335, 2, 28]),
   ResourceLoad('Coconut slice and KitKat', [677, 41.0, 72, 8.5, 63, 12, 12]),
 ];
-
