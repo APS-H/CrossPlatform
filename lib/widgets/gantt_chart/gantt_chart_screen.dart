@@ -1,5 +1,7 @@
 import 'package:crossplatform/common/helpers.dart';
+import 'package:crossplatform/models/mock.dart';
 import 'package:crossplatform/models/product.dart';
+import 'package:crossplatform/models/resource.dart';
 import 'package:flutter/material.dart';
 import 'product_gantt_page.dart';
 import 'dart:math';
@@ -16,11 +18,10 @@ class GranttChartScreenState extends State<GranttChartScreen>
   AnimationController animationController;
 
   //设置时间
-  DateTime fromDate = DateTime(2018, 1, 1);
-  DateTime toDate = DateTime(2018, 1, 2);
+  DateTime fromDate = DateTime(2018, 11, 7);
+  DateTime toDate = DateTime(2018, 11, 12);
 
-  List<Product> usersInChart;
-  List<Resource> projectsInChart;
+  List<ResourceUsage> _resourceUsageList;
 
   @override
   void initState() {
@@ -29,8 +30,7 @@ class GranttChartScreenState extends State<GranttChartScreen>
         duration: Duration(microseconds: 2000), vsync: this);
     animationController.forward();
 
-    projectsInChart = resources;
-    usersInChart = products;
+    _resourceUsageList = resourceUsageList;
   }
 
   Widget buildAppBar() {
@@ -53,8 +53,7 @@ class GranttChartScreenState extends State<GranttChartScreen>
               animationController: animationController,
               fromDate: fromDate,
               toDate: toDate,
-              resources: projectsInChart,
-              products: usersInChart,
+              data: _resourceUsageList,
             ),
           ),
         ],
@@ -67,8 +66,7 @@ class GanttChart extends StatelessWidget {
   final AnimationController animationController;
   final DateTime fromDate;
   final DateTime toDate;
-  final List<Resource> resources;
-  final List<Product> products;
+  final List<ResourceUsage> data;
 
   final _ganttHeaderBarHeight = 40.0;
 
@@ -76,13 +74,8 @@ class GanttChart extends StatelessWidget {
   int viewRangeToFitScreen = 6;
   Animation<double> width;
 
-  GanttChart({
-    this.animationController,
-    this.fromDate,
-    this.toDate,
-    this.resources,
-    this.products,
-  }) {
+  GanttChart(
+      {this.animationController, this.fromDate, this.toDate, this.data}) {
     viewRange = toDate.difference(fromDate).inHours;
   }
 
@@ -121,12 +114,12 @@ class GanttChart extends StatelessWidget {
   }
 
   List<Widget> buildChartBars(
-      List<Resource> data, double chartViewWidth, Color color) {
+      List<UsedTime> usedTimeList, double chartViewWidth, Color color) {
     List<Widget> chartBars = new List();
 
-    for (int i = 0; i < data.length; i++) {
-      var remainingWidth =
-          calculateRemainingWidth(data[i].startTime, data[i].endTime);
+    for (int i = 0; i < usedTimeList.length; i++) {
+      var remainingWidth = calculateRemainingWidth(
+          usedTimeList[i].startTime, usedTimeList[i].endTime);
       if (remainingWidth > 0) {
         chartBars.add(Container(
           decoration: BoxDecoration(
@@ -135,16 +128,16 @@ class GanttChart extends StatelessWidget {
           height: 30.0,
           width: remainingWidth * chartViewWidth / viewRangeToFitScreen,
           margin: EdgeInsets.only(
-              left: calculateDistanceToLeftBorder(data[i].startTime) *
+              left: calculateDistanceToLeftBorder(usedTimeList[i].startTime) *
                   chartViewWidth /
                   viewRangeToFitScreen,
               top: i == 0 ? 4.0 : 2.0,
-              bottom: i == data.length - 1 ? 4.0 : 2.0),
+              bottom: i == usedTimeList.length - 1 ? 4.0 : 2.0),
           alignment: Alignment.centerLeft,
           child: Padding(
             padding: const EdgeInsets.only(left: 8.0),
             child: Text(
-              data[i].name,
+              '${usedTimeList[i].product}',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 16.0),
@@ -213,10 +206,11 @@ class GanttChart extends StatelessWidget {
     );
   }
 
-  Widget buildChartForEachProduct(List<Resource> resourceData,
-      double chartViewWidth, Product product, BuildContext context) {
+  Widget buildChartForEachResource(
+      ResourceUsage resource, double chartViewWidth, BuildContext context) {
     Color color = randomColorGenerator();
-    var chartBars = buildChartBars(resourceData, chartViewWidth, color);
+    var chartBars =
+        buildChartBars(resource.usedTimeList, chartViewWidth, color);
     return GestureDetector(
         onTap: () {
           Navigator.push(
@@ -225,7 +219,9 @@ class GanttChart extends StatelessWidget {
           );
         },
         child: Container(
-          height: chartBars.length * 34.0 + _ganttHeaderBarHeight + 4.0,
+          height: (chartBars.length == 0 ? 1 : chartBars.length) * 34.0 +
+              _ganttHeaderBarHeight +
+              4.0,
           child: ListView(
             physics: new ClampingScrollPhysics(),
             scrollDirection: Axis.horizontal,
@@ -241,14 +237,14 @@ class GanttChart extends StatelessWidget {
                         children: [
                           Container(
                             width: chartViewWidth / viewRangeToFitScreen,
-                            height: chartBars.length * 34.0 + 4.0,
+                            height: (chartBars.length == 0 ? 1 : chartBars.length) * 34.0 + 4.0,
                             color: color.withAlpha(100),
                             child: Center(
                               child: RotatedBox(
                                 quarterTurns:
                                     chartBars.length * 34.0 + 4.0 > 50 ? 0 : 0,
                                 child: Text(
-                                  product.name,
+                                  resource.resourceID,
                                   textAlign: TextAlign.center,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
@@ -274,20 +270,9 @@ class GanttChart extends StatelessWidget {
   }
 
   List<Widget> buildChartContent(double chartViewWidth, BuildContext context) {
-    List<Widget> chartContent = new List();
-
-    products.forEach((product) {
-      List<Resource> resourcesOfProduct = resources
-          .where((resource) => resource.products.indexOf(product.id) != -1)
-          .toList();
-
-      if (resourcesOfProduct.length > 0) {
-        chartContent.add(buildChartForEachProduct(
-            resourcesOfProduct, chartViewWidth, product, context));
-      }
-    });
-
-    return chartContent;
+    return [
+      ...data.map((e) => buildChartForEachResource(e, chartViewWidth, context))
+    ];
   }
 
   @override
@@ -308,86 +293,3 @@ class GanttChart extends StatelessWidget {
     );
   }
 }
-
-var products = [
-  Product(id: 1, name: '产品1'),
-  Product(id: 2, name: '产品2'),
-  Product(id: 3, name: '产品3'),
-  Product(id: 4, name: '产品4'),
-  Product(id: 5, name: '产品5'),
-];
-
-var resources = [
-  Resource(
-      id: 1,
-      name: 'Line 1',
-      startTime: DateTime(2018, 1, 1, 7, 0),
-      endTime: DateTime(2018, 1, 1, 9, 0),
-      products: [1]),
-  Resource(
-      id: 2,
-      name: 'Line 1',
-      startTime: DateTime(2018, 1, 1, 9, 0),
-      endTime: DateTime(2018, 1, 1, 17, 0),
-      products: [2]),
-  Resource(
-      id: 3,
-      name: 'Line 1',
-      startTime: DateTime(2018, 1, 1, 18, 0),
-      endTime: DateTime(2018, 1, 1, 21, 0),
-      products: [3]),
-  Resource(
-      id: 4,
-      name: 'Line 1',
-      startTime: DateTime(2018, 1, 1, 21, 0),
-      endTime: DateTime(2018, 1, 1, 23, 0),
-      products: [4]),
-  Resource(
-      id: 5,
-      name: 'Line 4',
-      startTime: DateTime(2018, 1, 1, 9, 0),
-      endTime: DateTime(2018, 1, 1, 11, 0),
-      products: [3]),
-  Resource(
-      id: 6,
-      name: '李四',
-      startTime: DateTime(2018, 1, 1, 7, 0),
-      endTime: DateTime(2018, 1, 1, 9, 0),
-      products: [1]),
-  Resource(
-      id: 7,
-      name: '李四',
-      startTime: DateTime(2018, 1, 1, 9, 0),
-      endTime: DateTime(2018, 1, 1, 17, 0),
-      products: [2]),
-  Resource(
-      id: 8,
-      name: '李四',
-      startTime: DateTime(2018, 1, 1, 21, 0),
-      endTime: DateTime(2018, 1, 1, 23, 0),
-      products: [5]),
-  Resource(
-      id: 9,
-      name: '小明',
-      startTime: DateTime(2018, 1, 1, 9, 0),
-      endTime: DateTime(2018, 1, 1, 11, 0),
-      products: [3]),
-  Resource(
-      id: 10,
-      name: '小明',
-      startTime: DateTime(2018, 1, 1, 18, 0),
-      endTime: DateTime(2018, 1, 1, 19, 0),
-      products: [3]),
-  Resource(
-      id: 11,
-      name: '张三',
-      startTime: DateTime(2018, 1, 1, 19, 0),
-      endTime: DateTime(2018, 1, 1, 21, 0),
-      products: [3]),
-  Resource(
-      id: 12,
-      name: '张三',
-      startTime: DateTime(2018, 1, 1, 21, 0),
-      endTime: DateTime(2018, 1, 1, 23, 0),
-      products: [4]),
-];
