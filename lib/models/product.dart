@@ -10,8 +10,8 @@ class Resource {
   String name;
   DateTime startTime;
   DateTime endTime;
-  List<int> productions;
+  List<int> products;
 
   Resource(
-      {this.id, this.name, this.startTime, this.endTime, this.productions});
+      {this.id, this.name, this.startTime, this.endTime, this.products});
 }

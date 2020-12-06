@@ -1,3 +1,5 @@
+import 'package:crossplatform/models/resource.dart';
+
 class OrderPlan {
   OrderPlan(this.id, this.orderId, this.productNum, this.schedules);
 

@@ -20,3 +20,22 @@ class Resource {
 
   bool selected = false;
 }
+
+class ResourceUsage {
+  ResourceUsage(
+      this.resourceID, this.resourceName, this.resourceType, this.usedTimeList);
+
+  String resourceID;
+  String resourceName;
+  int resourceType;
+  List<UsedTime> usedTimeList;
+}
+
+class UsedTime {
+  UsedTime(this.product, this.startTime, this.endTime, this.isDelayed);
+
+  int product;
+  DateTime startTime;
+  DateTime endTime;
+  bool isDelayed;
+}

@@ -46,7 +46,7 @@ class HomePageState extends State<HomePage> {
         body = SettingPage();
         break;
       case SelectedItem.resourceUsage:
-        body = ResourceUsage();
+        body = ResourceUsageGantt();
         break;
       case SelectedItem.resourceLoadChart:
         body = ResourceLoadChart();

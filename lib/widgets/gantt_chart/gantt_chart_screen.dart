@@ -1,10 +1,8 @@
+import 'package:crossplatform/common/helpers.dart';
 import 'package:crossplatform/models/product.dart';
 import 'package:flutter/material.dart';
-import 'package:date_utils/date_utils.dart';
 import 'product_gantt_page.dart';
 import 'dart:math';
-
-import '../../models/mock.dart';
 
 class GranttChartScreen extends StatefulWidget {
   @override
@@ -31,8 +29,8 @@ class GranttChartScreenState extends State<GranttChartScreen>
         duration: Duration(microseconds: 2000), vsync: this);
     animationController.forward();
 
-    projectsInChart = projects;
-    usersInChart = users;
+    projectsInChart = resources;
+    usersInChart = products;
   }
 
   Widget buildAppBar() {
@@ -44,24 +42,24 @@ class GranttChartScreenState extends State<GranttChartScreen>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: () {
-          FocusScope.of(context).requestFocus(new FocusNode());
-        },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Expanded(
-              child: GanttChart(
-                animationController: animationController,
-                fromDate: fromDate,
-                toDate: toDate,
-                data: projectsInChart,
-                usersInChart: usersInChart,
-              ),
+      onTap: () {
+        FocusScope.of(context).requestFocus(new FocusNode());
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Expanded(
+            child: GanttChart(
+              animationController: animationController,
+              fromDate: fromDate,
+              toDate: toDate,
+              resources: projectsInChart,
+              products: usersInChart,
             ),
-          ],
-        ),
-      );
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -69,8 +67,10 @@ class GanttChart extends StatelessWidget {
   final AnimationController animationController;
   final DateTime fromDate;
   final DateTime toDate;
-  final List<Resource> data;
-  final List<Product> usersInChart;
+  final List<Resource> resources;
+  final List<Product> products;
+
+  final _ganttHeaderBarHeight = 40.0;
 
   int viewRange;
   int viewRangeToFitScreen = 6;
@@ -80,11 +80,10 @@ class GanttChart extends StatelessWidget {
     this.animationController,
     this.fromDate,
     this.toDate,
-    this.data,
-    this.usersInChart,
+    this.resources,
+    this.products,
   }) {
-    // viewRange = calculateNumberOfMonthsBetween(fromDate, toDate);
-    viewRange = calculateNumberOfHoursBetween(fromDate, toDate);
+    viewRange = toDate.difference(fromDate).inHours;
   }
 
   Color randomColorGenerator() {
@@ -92,44 +91,28 @@ class GanttChart extends StatelessWidget {
     return Color.fromRGBO(r.nextInt(256), r.nextInt(256), r.nextInt(256), 0.75);
   }
 
-  int calculateNumberOfMonthsBetween(DateTime from, DateTime to) {
-    return to.month - from.month + 12 * (to.year - from.year) + 1;
-  }
-
-  int calculateNumberOfHoursBetween(DateTime from, DateTime to) {
-    // print(from.difference(to).inHours);
-    return to.difference(from).inHours;
-  }
-
   int calculateDistanceToLeftBorder(DateTime projectStartedAt) {
     if (projectStartedAt.compareTo(fromDate) <= 0) {
       return 0;
     } else
-      // return calculateNumberOfMonthsBetween(fromDate, projectStartedAt) - 1;
-      return calculateNumberOfHoursBetween(fromDate, projectStartedAt);
+      return projectStartedAt.difference(fromDate).inHours;
   }
 
   int calculateRemainingWidth(
       DateTime projectStartedAt, DateTime projectEndedAt) {
-    int projectLength =
-    // calculateNumberOfMonthsBetween(projectStartedAt, projectEndedAt);
-    calculateNumberOfHoursBetween(projectStartedAt, projectEndedAt);
+    int projectLength = projectEndedAt.difference(projectStartedAt).inHours;
     if (projectStartedAt.compareTo(fromDate) >= 0 &&
         projectStartedAt.compareTo(toDate) <= 0) {
       if (projectLength <= viewRange)
         return projectLength;
       else
-        return viewRange -
-            // calculateNumberOfMonthsBetween(fromDate, projectStartedAt);
-            calculateNumberOfHoursBetween(fromDate, projectStartedAt);
+        return viewRange - projectStartedAt.difference(fromDate).inHours;
     } else if (projectStartedAt.isBefore(fromDate) &&
         projectEndedAt.isBefore(fromDate)) {
       return 0;
     } else if (projectStartedAt.isBefore(fromDate) &&
         projectEndedAt.isBefore(toDate)) {
-      return projectLength -
-          // calculateNumberOfMonthsBetween(projectStartedAt, fromDate);
-          calculateNumberOfHoursBetween(projectStartedAt, fromDate);
+      return projectLength - projectStartedAt.difference(fromDate).inHours;
     } else if (projectStartedAt.isBefore(fromDate) &&
         projectEndedAt.isAfter(toDate)) {
       return viewRange;
@@ -143,13 +126,13 @@ class GanttChart extends StatelessWidget {
 
     for (int i = 0; i < data.length; i++) {
       var remainingWidth =
-      calculateRemainingWidth(data[i].startTime, data[i].endTime);
+          calculateRemainingWidth(data[i].startTime, data[i].endTime);
       if (remainingWidth > 0) {
         chartBars.add(Container(
           decoration: BoxDecoration(
               color: color.withAlpha(100),
               borderRadius: BorderRadius.circular(10.0)),
-          height: 25.0,
+          height: 30.0,
           width: remainingWidth * chartViewWidth / viewRangeToFitScreen,
           margin: EdgeInsets.only(
               left: calculateDistanceToLeftBorder(data[i].startTime) *
@@ -164,7 +147,7 @@ class GanttChart extends StatelessWidget {
               data[i].name,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 10.0),
+              style: TextStyle(fontSize: 16.0),
             ),
           ),
         ));
@@ -177,16 +160,14 @@ class GanttChart extends StatelessWidget {
   //渲染头部时间信息
   Widget buildHeader(double chartViewWidth, Color color) {
     List<Widget> headerItems = new List();
-
     DateTime tempDate = fromDate;
-
     headerItems.add(Container(
       width: chartViewWidth / viewRangeToFitScreen,
       child: new Text(
         'NAME',
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 10.0,
+          fontSize: 15.0,
         ),
       ),
     ));
@@ -194,30 +175,21 @@ class GanttChart extends StatelessWidget {
     for (int i = 0; i < viewRange; i++) {
       headerItems.add(Container(
         width: chartViewWidth / viewRangeToFitScreen,
-        child: new Text(
-          tempDate.month.toString() +
-              '/' +
-              tempDate.year.toString() +
-              ' ' +
-              tempDate.hour.toString() +
-              ':' +
-              tempDate.minute.toString(),
+        child: Text(
+          dateTimeString(tempDate),
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 10.0,
+            fontSize: 15.0,
           ),
         ),
       ));
-      // tempDate = Utils.nextMonth(tempDate);
-      tempDate = tempDate.add(new Duration(hours: 1));
+      tempDate = tempDate.add(Duration(hours: 1));
     }
 
     return Container(
-      height: 25.0,
+      height: _ganttHeaderBarHeight,
       color: color.withAlpha(100),
-      child: Row(
-        children: headerItems,
-      ),
+      child: Row(children: headerItems),
     );
   }
 
@@ -230,7 +202,7 @@ class GanttChart extends StatelessWidget {
         decoration: BoxDecoration(
             border: Border(
                 right:
-                BorderSide(color: Colors.grey.withAlpha(100), width: 1.0))),
+                    BorderSide(color: Colors.grey.withAlpha(100), width: 1.0))),
         width: chartViewWidth / viewRangeToFitScreen,
         //height: 300.0,
       ));
@@ -241,63 +213,60 @@ class GanttChart extends StatelessWidget {
     );
   }
 
-  Widget buildChartForEachUser(List<Resource> userData, double chartViewWidth,
-      Product user, BuildContext context) {
+  Widget buildChartForEachProduct(List<Resource> resourceData,
+      double chartViewWidth, Product product, BuildContext context) {
     Color color = randomColorGenerator();
-    var chartBars = buildChartBars(userData, chartViewWidth, color);
-    return new GestureDetector(
+    var chartBars = buildChartBars(resourceData, chartViewWidth, color);
+    return GestureDetector(
         onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => ProductGanttPage()),
           );
         },
-        child: new Container(
-          height: chartBars.length * 29.0 + 25.0 + 4.0,
+        child: Container(
+          height: chartBars.length * 34.0 + _ganttHeaderBarHeight + 4.0,
           child: ListView(
             physics: new ClampingScrollPhysics(),
             scrollDirection: Axis.horizontal,
-            children: <Widget>[
-              Stack(fit: StackFit.loose, children: <Widget>[
+            children: [
+              Stack(fit: StackFit.loose, children: [
                 buildGrid(chartViewWidth),
                 buildHeader(chartViewWidth, color),
                 Container(
-                    margin: EdgeInsets.only(top: 25.0),
-                    child: Container(
-                      child: Column(
-                        children: <Widget>[
+                  margin: EdgeInsets.only(top: _ganttHeaderBarHeight),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
                           Container(
-                            child: Row(
-                              children: <Widget>[
-                                Container(
-                                    width:
-                                    chartViewWidth / viewRangeToFitScreen,
-                                    height: chartBars.length * 29.0 + 4.0,
-                                    color: color.withAlpha(100),
-                                    child: Center(
-                                      child: new RotatedBox(
-                                        quarterTurns:
-                                        chartBars.length * 29.0 + 4.0 > 50
-                                            ? 0
-                                            : 0,
-                                        child: new Text(
-                                          user.name,
-                                          textAlign: TextAlign.center,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    )),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: chartBars,
+                            width: chartViewWidth / viewRangeToFitScreen,
+                            height: chartBars.length * 34.0 + 4.0,
+                            color: color.withAlpha(100),
+                            child: Center(
+                              child: RotatedBox(
+                                quarterTurns:
+                                    chartBars.length * 34.0 + 4.0 > 50 ? 0 : 0,
+                                child: Text(
+                                  product.name,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(fontSize: 16),
                                 ),
-                              ],
+                              ),
                             ),
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: chartBars,
                           ),
                         ],
                       ),
-                    )),
+                      // TODO :
+                    ],
+                  ),
+                ),
               ]),
             ],
           ),
@@ -307,16 +276,14 @@ class GanttChart extends StatelessWidget {
   List<Widget> buildChartContent(double chartViewWidth, BuildContext context) {
     List<Widget> chartContent = new List();
 
-    usersInChart.forEach((user) {
-      List<Resource> projectsOfUser = new List();
-
-      projectsOfUser = projects
-          .where((project) => project.productions.indexOf(user.id) != -1)
+    products.forEach((product) {
+      List<Resource> resourcesOfProduct = resources
+          .where((resource) => resource.products.indexOf(product.id) != -1)
           .toList();
 
-      if (projectsOfUser.length > 0) {
-        chartContent.add(buildChartForEachUser(
-            projectsOfUser, chartViewWidth, user, context));
+      if (resourcesOfProduct.length > 0) {
+        chartContent.add(buildChartForEachProduct(
+            resourcesOfProduct, chartViewWidth, product, context));
       }
     });
 
@@ -342,7 +309,7 @@ class GanttChart extends StatelessWidget {
   }
 }
 
-var users = [
+var products = [
   Product(id: 1, name: '产品1'),
   Product(id: 2, name: '产品2'),
   Product(id: 3, name: '产品3'),
@@ -350,79 +317,77 @@ var users = [
   Product(id: 5, name: '产品5'),
 ];
 
-//productions：一条生产线同一时段可以同时生产多个产品，只是示例刚好没有这种情况
-//两个问题：1. 不能跨天显示 2. 时间必须为整点，否则会向下取整
-var projects = [
+var resources = [
   Resource(
       id: 1,
       name: 'Line 1',
       startTime: DateTime(2018, 1, 1, 7, 0),
       endTime: DateTime(2018, 1, 1, 9, 0),
-      productions: [1]),
+      products: [1]),
   Resource(
       id: 2,
       name: 'Line 1',
       startTime: DateTime(2018, 1, 1, 9, 0),
       endTime: DateTime(2018, 1, 1, 17, 0),
-      productions: [2]),
+      products: [2]),
   Resource(
       id: 3,
       name: 'Line 1',
       startTime: DateTime(2018, 1, 1, 18, 0),
       endTime: DateTime(2018, 1, 1, 21, 0),
-      productions: [3]),
+      products: [3]),
   Resource(
       id: 4,
       name: 'Line 1',
       startTime: DateTime(2018, 1, 1, 21, 0),
       endTime: DateTime(2018, 1, 1, 23, 0),
-      productions: [4]),
+      products: [4]),
   Resource(
       id: 5,
       name: 'Line 4',
       startTime: DateTime(2018, 1, 1, 9, 0),
       endTime: DateTime(2018, 1, 1, 11, 0),
-      productions: [3]),
+      products: [3]),
   Resource(
       id: 6,
       name: '李四',
       startTime: DateTime(2018, 1, 1, 7, 0),
       endTime: DateTime(2018, 1, 1, 9, 0),
-      productions: [1]),
+      products: [1]),
   Resource(
       id: 7,
       name: '李四',
       startTime: DateTime(2018, 1, 1, 9, 0),
       endTime: DateTime(2018, 1, 1, 17, 0),
-      productions: [2]),
+      products: [2]),
   Resource(
       id: 8,
       name: '李四',
       startTime: DateTime(2018, 1, 1, 21, 0),
       endTime: DateTime(2018, 1, 1, 23, 0),
-      productions: [5]),
+      products: [5]),
   Resource(
       id: 9,
       name: '小明',
       startTime: DateTime(2018, 1, 1, 9, 0),
       endTime: DateTime(2018, 1, 1, 11, 0),
-      productions: [3]),
+      products: [3]),
   Resource(
       id: 10,
       name: '小明',
       startTime: DateTime(2018, 1, 1, 18, 0),
       endTime: DateTime(2018, 1, 1, 19, 0),
-      productions: [3]),
+      products: [3]),
   Resource(
       id: 11,
       name: '张三',
       startTime: DateTime(2018, 1, 1, 19, 0),
       endTime: DateTime(2018, 1, 1, 21, 0),
-      productions: [3]),
+      products: [3]),
   Resource(
       id: 12,
       name: '张三',
       startTime: DateTime(2018, 1, 1, 21, 0),
       endTime: DateTime(2018, 1, 1, 23, 0),
-      productions: [4]),
+      products: [4]),
 ];

@@ -1,9 +1,7 @@
 import 'package:crossplatform/models/product.dart';
 import 'package:flutter/material.dart';
-import 'package:date_utils/date_utils.dart';
 import 'dart:math';
 
-import '../../models/mock.dart';
 
 class ProductGanttPage extends StatefulWidget {
   @override
@@ -305,7 +303,7 @@ class ProductGantt extends StatelessWidget {
       List<Resource> projectsOfUser = new List();
 
       projectsOfUser = projects
-          .where((project) => project.productions.indexOf(user.id) != -1)
+          .where((project) => project.products.indexOf(user.id) != -1)
           .toList();
 
       if (projectsOfUser.length > 0) {
@@ -337,84 +335,38 @@ class ProductGantt extends StatelessWidget {
 }
 
 var users = [
-  // Product(id: 1, name: '产品1'),
-  // Product(id: 2, name: '产品2'),
   Product(id: 3, name: '产品3'),
-  // Product(id: 4, name: '产品4'),
-  // Product(id: 5, name: '产品5'),
 ];
 
 var projects = [
-  // Resource(
-  //     id: 1,
-  //     name: 'Line 1',
-  //     startTime: DateTime(2018, 1, 1, 7, 0),
-  //     endTime: DateTime(2018, 1, 1, 9, 0),
-  //     productions: [1]),
-  // Resource(
-  //     id: 2,
-  //     name: 'Line 1',
-  //     startTime: DateTime(2018, 1, 1, 9, 0),
-  //     endTime: DateTime(2018, 1, 1, 17, 0),
-  //     productions: [2]),
   Resource(
       id: 1,
       name: 'Line 1',
       startTime: DateTime(2018, 1, 1, 18, 0),
       endTime: DateTime(2018, 1, 1, 21, 0),
-      productions: [3]),
-  // Resource(
-  //     id: 4,
-  //     name: 'Line 1',
-  //     startTime: DateTime(2018, 1, 1, 21, 0),
-  //     endTime: DateTime(2018, 1, 1, 23, 0),
-  //     productions: [4]),
+      products: [3]),
   Resource(
       id: 2,
       name: 'Line 4',
       startTime: DateTime(2018, 1, 1, 9, 0),
       endTime: DateTime(2018, 1, 1, 11, 0),
-      productions: [3]),
-  // Resource(
-  //     id: 6,
-  //     name: '李四',
-  //     startTime: DateTime(2018, 1, 1, 7, 0),
-  //     endTime: DateTime(2018, 1, 1, 9, 0),
-  //     productions: [1]),
-  // Resource(
-  //     id: 7,
-  //     name: '李四',
-  //     startTime: DateTime(2018, 1, 1, 9, 0),
-  //     endTime: DateTime(2018, 1, 1, 17, 0),
-  //     productions: [2]),
-  // Resource(
-  //     id: 8,
-  //     name: '李四',
-  //     startTime: DateTime(2018, 1, 1, 21, 0),
-  //     endTime: DateTime(2018, 1, 1, 23, 0),
-  //     productions: [5]),
+      products: [3]),
   Resource(
       id: 3,
       name: '小明',
       startTime: DateTime(2018, 1, 1, 9, 0),
       endTime: DateTime(2018, 1, 1, 11, 0),
-      productions: [3]),
+      products: [3]),
   Resource(
       id: 4,
       name: '小明',
       startTime: DateTime(2018, 1, 1, 18, 0),
       endTime: DateTime(2018, 1, 1, 19, 0),
-      productions: [3]),
+      products: [3]),
   Resource(
       id: 5,
       name: '张三',
       startTime: DateTime(2018, 1, 1, 19, 0),
       endTime: DateTime(2018, 1, 1, 21, 0),
-      productions: [3]),
-  // Resource(
-  //     id: 12,
-  //     name: '张三',
-  //     startTime: DateTime(2018, 1, 1, 21, 0),
-  //     endTime: DateTime(2018, 1, 1, 23, 0),
-  //     productions: [4]),
+      products: [3]),
 ];

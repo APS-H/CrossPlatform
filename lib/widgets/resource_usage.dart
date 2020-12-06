@@ -1,12 +1,12 @@
 import 'package:crossplatform/widgets/gantt_chart/gantt_chart_screen.dart';
 import 'package:flutter/material.dart';
 
-class ResourceUsage extends StatefulWidget {
+class ResourceUsageGantt extends StatefulWidget {
   @override
-  _ResourceUsageState createState() => _ResourceUsageState();
+  _ResourceUsageGanttState createState() => _ResourceUsageGanttState();
 }
 
-class _ResourceUsageState extends State<ResourceUsage> {
+class _ResourceUsageGanttState extends State<ResourceUsageGantt> {
   @override
   Widget build(BuildContext context) {
     return GranttChartScreen();
