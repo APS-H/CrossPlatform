@@ -1,11 +1,6 @@
 import 'package:crossplatform/common/labels.dart';
-import 'package:crossplatform/layout/adaptive.dart';
+import 'package:crossplatform/routes/navigator.dart';
 import 'package:crossplatform/widgets/drawer.dart';
-import 'package:crossplatform/widgets/order_detail.dart';
-import 'package:crossplatform/widgets/resource_load.dart';
-import 'package:crossplatform/widgets/resource_usage.dart';
-import 'package:crossplatform/widgets/schedule_detail.dart';
-import 'package:crossplatform/widgets/settings.dart';
 import 'package:flutter/material.dart';
 
 const appBarDesktopHeight = 56.0;
@@ -24,9 +19,16 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  SelectedItem selected = SelectedItem.placeholder;
+  NavItem selected = NavItem.placeholder;
+  DrawerNavigator navigator;
 
-  void handleClickEvent(SelectedItem item) {
+  @override
+  void initState() {
+    navigator = DrawerNavigator();
+    super.initState();
+  }
+
+  void handleClickEvent(NavItem item) {
     setState(() {
       selected = item;
     });
@@ -34,87 +36,30 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDesktop = isDisplayDesktop(context);
-    dynamic body = Text('data');
-    switch (selected) {
-      case SelectedItem.placeholder:
-        body = Text('');
-        break;
-      case SelectedItem.timeSetting:
-        body = SettingPage();
-        break;
-      case SelectedItem.resourceUsage:
-        body = ResourceUsageGantt();
-        break;
-      case SelectedItem.resourceLoadChart:
-        body = ResourceLoadChart();
-        break;
-      case SelectedItem.resourceLoadHumanTable:
-        body = HumanResourceTable();
-        break;
-      case SelectedItem.resourceLoadEquipmentTable:
-        body = EquipmentResourceTable();
-        break;
-      case SelectedItem.orderDetailChart:
-        body = OrderProgressChart();
-        break;
-      case SelectedItem.orderDetailTable:
-        body = OrderTable();
-        break;
-      case SelectedItem.scheduleDetailOrderPlanTable:
-        body = ScheduleDetailOrderPlanTable();
-        break;
-      case SelectedItem.scheduleDetailOrderProductionTable:
-        body = ScheduleDetailOrderProductionTable();
-        break;
-      case SelectedItem.scheduleDetailProductionTable:
-        body = ScheduleDetailProductionTable();
-        break;
-      case SelectedItem.scheduleDetailProductionResourceTable:
-        body = ScheduleDetailProductionResourceTable();
-        break;
-      case SelectedItem.resourceLoad:
-      case SelectedItem.orderDetail:
-      case SelectedItem.scheduleDetail:
-        body = null;
-        break;
-    }
-
-    if (isDesktop) {
-      return _InheritedHomePage(
-        child: Row(
-          children: [
-            SideDrawer(),
-            const VerticalDivider(width: 1),
-            Expanded(
-              child: Scaffold(
-                appBar: const AdaptiveAppBar(
-                  isDesktop: true,
-                ),
-                body: SafeArea(
-                  child: Padding(
-                    padding: isDesktop
-                        ? const EdgeInsets.all(0)
-                        : const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 24),
-                    child: body,
-                  ),
+    final navTarget = navigator.of(selected);
+    return _InheritedHomePage(
+      child: Row(
+        children: [
+          SideDrawer(),
+          const VerticalDivider(width: 1),
+          Expanded(
+            child: Scaffold(
+              appBar: AdaptiveAppBar(
+                isDesktop: true,
+                title: navTarget.title,
+              ),
+              body: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(0),
+                  child: navTarget.page,
                 ),
               ),
             ),
-          ],
-        ),
-        data: this,
-      );
-    } else {
-      return Scaffold(
-        appBar: const AdaptiveAppBar(),
-        body: body,
-        // drawer: SideDrawer(),
-      );
-    }
+          ),
+        ],
+      ),
+      data: this,
+    );
   }
 }
 
@@ -137,9 +82,11 @@ class AdaptiveAppBar extends StatelessWidget implements PreferredSizeWidget {
   const AdaptiveAppBar({
     Key key,
     this.isDesktop = false,
+    this.title = "高级排程系统",
   }) : super(key: key);
 
   final bool isDesktop;
+  final String title;
 
   @override
   Size get preferredSize => isDesktop
@@ -148,10 +95,9 @@ class AdaptiveAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeData = Theme.of(context);
     return AppBar(
       automaticallyImplyLeading: !isDesktop,
-      title: Text('APSH - 时间设置'),
+      title: Text('APSH - $title'),
       actions: [
         if (!isDesktop)
           IconButton(
