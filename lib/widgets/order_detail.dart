@@ -1,7 +1,9 @@
+import 'package:crossplatform/apis/order.dart';
 import 'package:crossplatform/common/colors.dart';
 import 'package:crossplatform/common/helpers.dart';
 import 'package:crossplatform/models/mock.dart';
 import 'package:crossplatform/models/order.dart';
+import 'package:crossplatform/models/store.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
@@ -138,7 +140,25 @@ class _OrderTableState extends State<OrderTable> {
   int _sortColumnIndex;
   bool _sortAscending = true;
 
-  final _orderDataSource = OrderDataSource(orders);
+  OrderDataSource _orderDataSource;
+
+  @override
+  void initState() {
+    _orderDataSource = OrderDataSource(store.orders);
+    getAllOrders(
+      (List<Order> res) => this.setState(() {
+        store.orders = res;
+        _orderDataSource = OrderDataSource(store.orders);
+      }),
+    );
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _orderDataSource = null;
+    super.dispose();
+  }
 
   void _sort<T>(
       Comparable<T> getField(Order d), int columnIndex, bool ascending) {

@@ -1,9 +1,11 @@
 import 'dart:math';
 
+import 'package:crossplatform/apis/resource.dart';
 import 'package:crossplatform/common/helpers.dart';
 import 'package:crossplatform/common/colors.dart';
 import 'package:crossplatform/models/mock.dart';
 import 'package:crossplatform/models/resource.dart';
+import 'package:crossplatform/models/store.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -285,7 +287,7 @@ class _HumanResourceTableState extends State<HumanResourceTable> {
   int _sortColumnIndex;
   bool _sortAscending = true;
 
-  final _humanResourceDataSource = ResourceDataSource(humanResources);
+  ResourceDataSource _humanResourceDataSource;
 
   List<Widget> _shiftLegend() {
     return [
@@ -295,6 +297,24 @@ class _HumanResourceTableState extends State<HumanResourceTable> {
                 '${e.name}: ${timeString(e.startTime)}~${timeString(e.endTime)}'),
           ))
     ];
+  }
+
+  @override
+  void initState() {
+    _humanResourceDataSource = ResourceDataSource(store.humanResources);
+    getAllHumanResources(
+      (List<Resource> res) => this.setState(() {
+        store.humanResources = res;
+        _humanResourceDataSource = ResourceDataSource(store.humanResources);
+      }),
+    );
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _humanResourceDataSource = null;
+    super.dispose();
   }
 
   void _sort<T>(
@@ -442,7 +462,7 @@ class _EquipmentResourceTableState extends State<EquipmentResourceTable> {
   int _sortColumnIndex;
   bool _sortAscending = true;
 
-  final _equipmentResourceDataSource = ResourceDataSource(equipmentResource);
+  ResourceDataSource _equipmentResourceDataSource;
 
   List<Widget> _shiftLegend() {
     return [
@@ -452,6 +472,25 @@ class _EquipmentResourceTableState extends State<EquipmentResourceTable> {
                 '${e.name}: ${timeString(e.startTime)}~${timeString(e.endTime)}'),
           ))
     ];
+  }
+
+  @override
+  void initState() {
+    _equipmentResourceDataSource = ResourceDataSource(store.equipmentResource);
+    getAllEquipmentResources(
+      (List<Resource> res) => this.setState(() {
+        store.equipmentResource = res;
+        _equipmentResourceDataSource =
+            ResourceDataSource(store.equipmentResource);
+      }),
+    );
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _equipmentResourceDataSource = null;
+    super.dispose();
   }
 
   void _sort<T>(

@@ -3,7 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 
 final httpClient = new HttpClient();
-const host = "http://8.131.96.86:30808";
+// const host = "http://8.131.96.86:30808";
+const host = "http://localhost:8080";
 
 String withHost(String url) {
   return "$host$url";

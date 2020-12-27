@@ -30,6 +30,12 @@ class _ScheduleDetailOrderPlanTableState
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _orderPlanDataSource = null;
+    super.dispose();
+  }
+
   void _sort<T>(
       Comparable<T> getField(OrderPlan d), int columnIndex, bool ascending) {
     _orderPlanDataSource._sort<T>(getField, ascending);
@@ -112,6 +118,12 @@ class _ScheduleDetailOrderProductionTableState
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _orderProductionDataSource = null;
+    super.dispose();
+  }
+
   void _sort<T>(Comparable<T> getField(OrderProduction d), int columnIndex,
       bool ascending) {
     _orderProductionDataSource._sort<T>(getField, ascending);
@@ -183,6 +195,12 @@ class _ScheduleDetailProductionTableState
       }),
     );
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _productionDataSource = null;
+    super.dispose();
   }
 
   void _sort<T>(
@@ -260,6 +278,12 @@ class _ScheduleDetailProductionResourceTableState
       }),
     );
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _productionResourceDataSource = null;
+    super.dispose();
   }
 
   void _sort<T>(Comparable<T> getField(ProductionResource d), int columnIndex,
