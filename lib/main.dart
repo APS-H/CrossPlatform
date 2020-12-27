@@ -1,8 +1,10 @@
+import 'package:crossplatform/apis/schedule.dart';
 import 'package:crossplatform/widgets/home.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {
+  getPlanTable();
   GoogleFonts.config.allowRuntimeFetching = false;
   runApp(App());
 }

@@ -7,7 +7,6 @@ import 'package:crossplatform/models/resource.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
-import 'package:quiver/iterables.dart';
 
 class ResourceLoadSummary extends StatelessWidget {
   const ResourceLoadSummary(this._dataSource);
@@ -24,7 +23,7 @@ class ResourceLoadSummary extends StatelessWidget {
       }
     }
     if (count == 0) return 0.0;
-    final s = load / count;
+    final s = load / 100 / count;
     return s > 1.0 ? 1.0 : s;
   }
 
@@ -91,7 +90,7 @@ class ResourceLoadSummary extends StatelessWidget {
                       animation: true,
                       percent: humanLoadSummary,
                       center: Text(
-                        "${humanLoadSummary * 100}%",
+                        "${(humanLoadSummary * 100).toStringAsFixed(2)}%",
                         style: const TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 20.0),
                       ),
@@ -112,7 +111,7 @@ class ResourceLoadSummary extends StatelessWidget {
                       animation: true,
                       percent: equipmentLoadSummary,
                       center: Text(
-                        "${equipmentLoadSummary * 100}%",
+                        "${(equipmentLoadSummary * 100).toStringAsFixed(2)}%",
                         style: const TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 20.0),
                       ),

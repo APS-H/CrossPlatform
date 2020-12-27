@@ -1,7 +1,11 @@
-import 'package:crossplatform/models/resource.dart';
-
 class OrderPlan {
   OrderPlan(this.id, this.orderId, this.productNum, this.schedules);
+
+  OrderPlan.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        orderId = json['orderNo'],
+        productNum = json['productNum'],
+        schedules = json['schedules'];
 
   int id;
   String orderId;
@@ -33,6 +37,12 @@ class ProductionResource {
 
 class Schedule {
   Schedule(this.id, this.productNum, this.startTime, this.endTime);
+
+  Schedule.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        productNum = json['productNum'],
+        startTime = json['startTime'],
+        endTime = json['endTime'];
 
   int id;
   int productNum;
