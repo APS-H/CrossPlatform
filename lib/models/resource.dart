@@ -13,6 +13,12 @@ class ResourceLoad {
 class Resource {
   Resource(this.name, this.count, this.shift, this.workDays);
 
+  Resource.fromJson(Map<String, dynamic> json)
+      : name = json['teamName'] == null ? json['name'] : json['teamName'],
+        count = json['count'],
+        shift = json['shift'],
+        workDays = [...json['workDay']];
+
   String name;
   int count;
   int shift;

@@ -1,7 +1,9 @@
-import 'package:crossplatform/models/mock.dart';
+import 'package:crossplatform/apis/schedule.dart';
 import 'package:crossplatform/models/schedule.dart';
 import 'package:crossplatform/common/helpers.dart';
+import 'package:crossplatform/models/store.dart';
 import 'package:flutter/material.dart';
+import 'package:quiver/iterables.dart';
 
 class ScheduleDetailOrderPlanTable extends StatefulWidget {
   @override
@@ -14,7 +16,25 @@ class _ScheduleDetailOrderPlanTableState
   int _sortColumnIndex;
   bool _sortAscending = true;
 
-  final _orderPlanDataSource = OrderPlanDataSource(orderPlans);
+  OrderPlanDataSource _orderPlanDataSource;
+
+  @override
+  void initState() {
+    _orderPlanDataSource = OrderPlanDataSource(store.orderPlans);
+    getPlanTable(
+      (List<OrderPlan> res) => this.setState(() {
+        store.orderPlans = res;
+        _orderPlanDataSource = OrderPlanDataSource(store.orderPlans);
+      }),
+    );
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _orderPlanDataSource = null;
+    super.dispose();
+  }
 
   void _sort<T>(
       Comparable<T> getField(OrderPlan d), int columnIndex, bool ascending) {
@@ -40,7 +60,7 @@ class _ScheduleDetailOrderPlanTableState
               Padding(padding: EdgeInsets.fromLTRB(0, 0, 10, 0)),
             ],
           ),
-          rowsPerPage: _orderPlanDataSource.orderPlans.length,
+          rowsPerPage: max([1, _orderPlanDataSource.orderPlans.length]),
           sortColumnIndex: _sortColumnIndex,
           sortAscending: _sortAscending,
           columns: <DataColumn>[
@@ -82,8 +102,27 @@ class _ScheduleDetailOrderProductionTableState
   int _sortColumnIndex;
   bool _sortAscending = true;
 
-  final _orderProductionDataSource =
-      OrderProductionDataSource(orderProductions);
+  OrderProductionDataSource _orderProductionDataSource;
+
+  @override
+  void initState() {
+    _orderProductionDataSource =
+        OrderProductionDataSource(store.orderProductions);
+    getOrderProductionTable(
+      (List<OrderProduction> res) => this.setState(() {
+        store.orderProductions = res;
+        _orderProductionDataSource =
+            OrderProductionDataSource(store.orderProductions);
+      }),
+    );
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _orderProductionDataSource = null;
+    super.dispose();
+  }
 
   void _sort<T>(Comparable<T> getField(OrderProduction d), int columnIndex,
       bool ascending) {
@@ -108,7 +147,8 @@ class _ScheduleDetailOrderProductionTableState
               Padding(padding: EdgeInsets.fromLTRB(0, 0, 10, 0)),
             ],
           ),
-          rowsPerPage: _orderProductionDataSource.orderProductions.length,
+          rowsPerPage:
+              max([1, _orderProductionDataSource.orderProductions.length]),
           sortColumnIndex: _sortColumnIndex,
           sortAscending: _sortAscending,
           columns: <DataColumn>[
@@ -143,7 +183,25 @@ class _ScheduleDetailProductionTableState
   int _sortColumnIndex;
   bool _sortAscending = true;
 
-  final _productionDataSource = ProductionDataSource(productions);
+  ProductionDataSource _productionDataSource;
+
+  @override
+  void initState() {
+    _productionDataSource = ProductionDataSource(store.productions);
+    getProductionTable(
+      (List<Production> res) => this.setState(() {
+        store.productions = res;
+        _productionDataSource = ProductionDataSource(store.productions);
+      }),
+    );
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _productionDataSource = null;
+    super.dispose();
+  }
 
   void _sort<T>(
       Comparable<T> getField(Production d), int columnIndex, bool ascending) {
@@ -169,7 +227,7 @@ class _ScheduleDetailProductionTableState
               Padding(padding: EdgeInsets.fromLTRB(0, 0, 10, 0)),
             ],
           ),
-          rowsPerPage: _productionDataSource.productions.length,
+          rowsPerPage: max([1, _productionDataSource.productions.length]),
           sortColumnIndex: _sortColumnIndex,
           sortAscending: _sortAscending,
           columns: <DataColumn>[
@@ -206,8 +264,27 @@ class _ScheduleDetailProductionResourceTableState
   int _sortColumnIndex;
   bool _sortAscending = true;
 
-  final _productionResourceDataSource =
-      ProductionResourceDataSource(productionResources);
+  ProductionResourceDataSource _productionResourceDataSource;
+
+  @override
+  void initState() {
+    _productionResourceDataSource =
+        ProductionResourceDataSource(store.productionResources);
+    getProductionResourceTable(
+      (List<ProductionResource> res) => this.setState(() {
+        store.productionResources = res;
+        _productionResourceDataSource =
+            ProductionResourceDataSource(store.productionResources);
+      }),
+    );
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _productionResourceDataSource = null;
+    super.dispose();
+  }
 
   void _sort<T>(Comparable<T> getField(ProductionResource d), int columnIndex,
       bool ascending) {
@@ -233,7 +310,8 @@ class _ScheduleDetailProductionResourceTableState
               Padding(padding: EdgeInsets.fromLTRB(0, 0, 10, 0)),
             ],
           ),
-          rowsPerPage: _productionResourceDataSource.productionResources.length,
+          rowsPerPage: max(
+              [1, _productionResourceDataSource.productionResources.length]),
           sortColumnIndex: _sortColumnIndex,
           sortAscending: _sortAscending,
           columns: <DataColumn>[
