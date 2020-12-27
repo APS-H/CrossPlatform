@@ -5,7 +5,7 @@ class OrderPlan {
       : id = json['id'],
         orderId = json['orderNo'],
         productNum = json['productNum'],
-        schedules = json['schedules'];
+        schedules = [...json['schedules'].map((s) => Schedule.fromJson(s))];
 
   int id;
   String orderId;
@@ -41,8 +41,8 @@ class Schedule {
   Schedule.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         productNum = json['productNum'],
-        startTime = json['startTime'],
-        endTime = json['endTime'];
+        startTime = DateTime.parse(json['startTime']),
+        endTime = DateTime.parse(json['endTime']);
 
   int id;
   int productNum;

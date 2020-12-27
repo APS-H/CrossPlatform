@@ -3,16 +3,22 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 
 final httpClient = new HttpClient();
-const host = "http://8.131.96.86";
+const host = "http://8.131.96.86:30808";
+
+String withHost(String url) {
+  return "$host$url";
+}
 
 Future<String> sendGetRequest(String url) async {
-  return http.Client().get(url).then((http.Response response) => response.body);
+  return http.Client()
+      .get(withHost(url))
+      .then((http.Response response) => response.body);
 }
 
 Future<String> sendPostRequest(String url, Object body) async {
   String result;
   try {
-    var request = await httpClient.postUrl(Uri.parse(url));
+    var request = await httpClient.postUrl(Uri.parse(withHost(url)));
     request.write(body);
     var response = await request.close();
     if (response.statusCode == HttpStatus.ok) {

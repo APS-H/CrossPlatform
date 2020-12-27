@@ -1,7 +1,10 @@
+import 'package:crossplatform/apis/schedule.dart';
 import 'package:crossplatform/models/mock.dart';
 import 'package:crossplatform/models/schedule.dart';
 import 'package:crossplatform/common/helpers.dart';
+import 'package:crossplatform/models/store.dart';
 import 'package:flutter/material.dart';
+import 'package:quiver/iterables.dart';
 
 class ScheduleDetailOrderPlanTable extends StatefulWidget {
   @override
@@ -14,7 +17,19 @@ class _ScheduleDetailOrderPlanTableState
   int _sortColumnIndex;
   bool _sortAscending = true;
 
-  final _orderPlanDataSource = OrderPlanDataSource(orderPlans);
+  OrderPlanDataSource _orderPlanDataSource;
+
+  @override
+  void initState() {
+    _orderPlanDataSource = OrderPlanDataSource(store.orderPlans);
+    getPlanTable(
+      (List<OrderPlan> res) => this.setState(() {
+        store.orderPlans = res;
+        _orderPlanDataSource = OrderPlanDataSource(store.orderPlans);
+      }),
+    );
+    super.initState();
+  }
 
   void _sort<T>(
       Comparable<T> getField(OrderPlan d), int columnIndex, bool ascending) {
@@ -40,7 +55,7 @@ class _ScheduleDetailOrderPlanTableState
               Padding(padding: EdgeInsets.fromLTRB(0, 0, 10, 0)),
             ],
           ),
-          rowsPerPage: _orderPlanDataSource.orderPlans.length,
+          rowsPerPage: max([1, _orderPlanDataSource.orderPlans.length]),
           sortColumnIndex: _sortColumnIndex,
           sortAscending: _sortAscending,
           columns: <DataColumn>[
